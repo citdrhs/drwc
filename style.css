@@ -1,0 +1,317 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif; /* can be changed in the future */
+  background-color: #fafaf9;
+}
+
+/* ------- STUFF ON EVERY PAGE ------- */
+
+p {
+  padding: 10px;
+}
+
+h1, h2, h3, h4 {
+  padding: 5px;
+}
+
+/* ----- NAVBAR ----- */
+
+nav {
+  overflow: hidden;
+  background-color: #233e90;
+  width: 100%;
+}
+
+#meetTheTeam {
+  margin-bottom: 0;
+}
+
+#navlogo {
+  height: 30px;
+  width: auto;
+}
+
+#navlogo_link {
+  padding: 10px 20px;
+}
+
+#drhslogo_link {
+  float: right;
+  height: 30px;
+  width: auto;
+  padding: 12px;
+}
+
+#drhslogo {
+  height: 30px;
+  width: auto;
+  background-color: #f2f2f2;
+  border-radius: 90px;
+}
+
+#ConsultantsTitle {
+  text-align: center;
+}
+
+h1 {
+  text-align: center;
+}
+
+nav a {
+  color: #f2f2f2;
+  float: left;
+  text-align: center;
+  padding: 16px 20px;
+  text-decoration: none;
+}
+
+nav a:hover {
+  background-color: #132b7d;
+  transition: 0.3s;
+}
+
+nav a:not(:hover) {
+  background-color: #233e90;
+  transition: 0.3s;
+}
+
+/* ----- FOOTER ----- */
+
+footer {
+  bottom: 0;
+  width: 100%;
+  background-color: #101424;
+  text-align: left;
+}
+
+footer p {
+  margin: 2px 0;
+  padding: 2px 14px;
+  font-size: 14px;
+  color: white;
+  text-align: center;
+}
+
+/* ------- STUFF ON SPECIFIC PAGES ------- */
+
+/* ----- HOME (Called index) PAGE ----- */
+
+.homeheader { /* Makes a container for the image */
+  background-color: white;
+  height: 100px;
+  width: 100%;
+  opacity: 0.5;
+}
+
+.homeheader p {
+  text-align: center;
+  padding: 20px;
+}
+
+/* ----- SIGN-UPS PAGE ----- */
+
+#wrap { /* centers the calendar */
+  text-align: center;
+  background-color: #dedede;
+  margin-bottom:0;
+  height:50%;
+}
+
+
+
+#signup {
+  text-align:center;
+}
+#headindex{
+    background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 1px;
+    margin-top:50px;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#indexside {
+  margin-top:0%;
+}
+.linktosign{
+  color: #dbf4ff;
+}
+
+#sign-up-form-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+#sign-up-form {
+  height: 600px;
+  border: none;
+  margin: 0 0 40px 0;
+}
+
+/* ----- CONSULTANTS PAGE ----- */
+
+#consultantsimg { /* Changes how the image looks */
+   height: auto;
+  width: 100%;
+  opacity: 0.85;
+  padding: 0;
+  margin: 0;
+}
+
+.consultants{
+  text-align:center;
+}
+
+#firstList, #secondList{
+  display: inline-block;
+  /*border: 1px solid #233e90; */
+  padding: 10px;
+  width: 320px;
+  vertical-align: middle;
+  list-style-type: none;
+  text-align: left;
+  margin: 50px;
+  font-size: 20px;
+}
+
+#firstList li, #secondList li {
+  padding: 5px;
+}
+
+#calendarintro {
+  text-align: center;
+}
+/* ----- MEDIA PAGE ----- */
+
+#mediatext{
+  text-align: center;
+  background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 200px;
+    margin-right: 200px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+}
+
+#medialist{
+  list-style-type: none;
+}
+
+#instapic{
+  height: 20px;
+  width: 20px;
+}
+/* ----- APPLICATIONS PAGE ----- */
+.form {
+  text-align: center;
+  background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 200px;
+    margin-right: 200px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+}
+
+.subtitle{
+  text-align: center;
+}
+
+#indexside {
+  display: flex;
+  width: 100%;
+}
+
+#firstList{
+   background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 50px;
+    margin-right: 50px; /* loser */
+    padding: 60px 30px;
+    min-width: 200px;
+    text-align: center;
+}
+
+#secondList{
+  background: #dbf4ff;
+  border-radius: 50px;
+  margin-bottom: 5%;
+  margin-left: 50px;
+  margin-right: 50px;
+  padding: 60px 30px;
+  min-width: 200px;
+  text-align: center;
+}
+
+#appinfo{
+  background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+    transition: 0.5s;
+   /*text-align: center; */
+  
+}
+
+#apptext2{
+  background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 50px;
+    margin-right: 50px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+    transition: 0.5s;
+   /* text-align: center; */
+}
+
+/* ----- RESOURCES PAGE ----- */
+
+.dropdown, .dropdown-content {
+  text-align: center;
+}
+
+.dropdown-content {
+  display:none;
+  background-color: #bee3f3;
+  color: #dedede;
+  padding: 15px 0 25px;
+  width: 400px;
+  margin: auto;
+  border-radius: 0 0 10px 10px;
+}
+
+#bubbleresource{
+  text-align: center;
+  background: #dbf4ff;
+    border-radius: 50px;
+    margin-bottom: 5%;
+    margin-left: 200px;
+    margin-right: 200px;
+    padding: 60px 30px;
+    box-sizing: border-box;
+}
+
+
+.show {
+  display: block;
+}
+
+.dropdown button {
+  min-width: 400px;
+  padding: 4px;
+  background-color: #233e90;
+  color: #ffffff;
+  font-size: 0.9em;
+}
