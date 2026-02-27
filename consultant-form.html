@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Writing Center | Consultant Form</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="Images/Logo.png">
+</head>
+
+<body id="consultantform">
+  <!-- navbar, put on each page -->
+  <nav>
+    <a id="navlogo_link" href="./index.html"> <img id="navlogo" src="./Images/Logo.png"> </a>
+    <a href="./signups.html"> Sign-Ups </a>
+    <a href="./consultants.html"> Staff </a>
+    <a href="./media.html"> Media </a>
+    <a href="./resources.html"> Resources </a>
+    <a href="./applications.html"> Consultant Applications </a>
+    <a href="./consultant-form.html"> Consultant Form </a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"> <img id="drhslogo" src="./Images/drhslogo.png"> </a>
+  </nav>
+  
+
+
+  <main class="container">
+    <div class="card" id="calendarintro">
+      <h2>Writing Center Consultant Form</h2>
+      <p>Please fill out this form after each consultation session. This helps us track appointments and improve our services.</p>
+      <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+    </div>
+
+    <!-- Consultant form -->
+    <section id="tab-consultant" class="tab-panel active" role="tabpanel">
+      <div class="panel-head">
+        <h2>Consultant Session Report</h2>
+      </div>
+
+      <form class="card">
+        <label class="field">
+          <span>Sign-Up Appointment (Date)</span>
+          <select name="signupDate" required>
+            <option selected disabled>Choose a sign-up date</option>
+            <option>1</option>
+          </select>
+        </label>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Consultant's Name (First and Last)</span>
+            <input type="text" name="consultantName" required />
+          </label>
+
+          <label class="field">
+            <span>Writer's Name (First and Last)</span>
+            <input type="text" name="writerName" required />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Date of Appointment</span>
+            <input type="date" name="dateOfAppointment" required />
+          </label>
+
+          <label class="field">
+            <span>Writer's Grade Level</span>
+            <select name="gradeLevel" required>
+              <option value="" selected disabled>Choose</option>
+              <option>9th Grade</option>
+              <option>10th Grade</option>
+              <option>11th Grade</option>
+              <option>12th Grade</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Teacher who gave the writing assignment</span>
+          <select name="teacherAssigned" required>
+            <option value="" selected disabled>Choose</option>
+            <option>Mrs. Tambellini</option>
+            <option>Mrs. Cho</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Course (Subject + Level)</span>
+          <input type="text" name="courseLevel" placeholder="Ex. English 12 AP" required />
+        </label>
+
+        <label class="field">
+          <span>Type of Assignment</span>
+          <select name="assignmentType" required>
+            <option value="" selected disabled>Choose</option>
+            <option>Analytical Essay</option>
+            <option>Argumentative/Persuasive Essay</option>
+            <option>Narrative/College Essay</option>
+            <option>CIT Paper/Proposal</option>
+            <option>Science Report</option>
+            <option>History Paper</option>
+            <option>Creative Writing</option>
+            <option>Research Paper</option>
+            <option>Presentation</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>DUE DATE for this writing assignment</span>
+          <input type="date" name="dueDate" required />
+        </label>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Writer confidence BEFORE</span>
+            <select name="beforeConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Writer confidence AFTER</span>
+            <select name="afterConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>What aspects of writing did you work on today?</span>
+          <textarea name="workedOn" rows="4" required></textarea>
+        </label>
+
+        <label class="field">
+          <span>Next steps for the writer</span>
+          <textarea name="nextSteps" rows="4" required></textarea>
+        </label>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">
+            Submit
+          </button>
+          <button class="btn ghost" type="reset">
+            Reset
+          </button>
+        </div>
+
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
+  </footer>
+  <script src="theme-toggle.js"></script>
+</body>
+
+</html>
