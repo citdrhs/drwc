@@ -16,14 +16,12 @@
     <a href="./media.html"> Media </a> </li>
     <a href="./resources.html"> Resources </a>
     <a href="./applications.html"> Consultant Applications </a>
+    <a href="./consultant-form.html"> Consultant Form </a>
     <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"> <img id="drhslogo" src="./Images/drhslogo.png"> </a>
    <!-- <a href="./admin.html"> Admin </a> -->
   </nav>
   
-  <h1 id="signup">
-    Sign-Up
-  </h1>
-  <p id="calendarintro">Use the form below to sign up for a meeting with a consultant that will help you out with all of your writing needs!</p>
+
   <!--
   <div id="calendar">
   <p id="wrap">
@@ -32,23 +30,135 @@
   </div>
   -->
 
-  <div id="sign-up-form-container">
-    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeoGRx85HQi7VeC--0iVp0xTKhmQxnYlteQ_MjsjGmLzh5epw/viewform?embedded=true" width="640" height="2861" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-  </div>
+  <main class="container">
+    <div class="card" id="calendarintro">
+      <h2>Writing Center Student Sign-Up Form</h2>
+      <p><strong>Hours of Operation:</strong> Wednesdays during One Lunch (A Lunch and B Lunch) in room 212</p>
+      <p>When you sign up for your Writing Center appointment, please make note of the date, time, and location for your records. By submitting this form, you are committing to attending your appointment.</p>
+      <p>Please make sure that you keep your scheduled appointment and arrive on time.</p>
+      <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+    </div>
+    <!-- Student sign up -->
+    <section id="tab-signup" class="tab-panel active" role="tabpanel">
+      <div class="panel-head">
+        <h2>Student Sign-Up Form</h2>
+      </div>
 
-  <footer>
-    <p> Writing Center Location: Room 212
-    <p>
-      <br>
-    <p> Sponsor Contacts </p>
-    <br>
-    <p> Mrs. Tambellini | English teacher | Room 213 </p>
-    <p> mbtambellini@henrico.k12.va.us </p>
-    <br>
-    <p> Mrs. Cho | English teacher | Room 212 </p>
-    <p> mdcho@henrico.k12.va.us </p>
+      <form class="card">
+
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Email <strong>*</strong></span>
+            <input type="email" name="email" required />
+          </label>
+       
+       
+          <label class="field">
+            <span>Last Name <strong>*</strong></span>
+            <input type="text" name="lastName" required />
+          </label>
+        </div>
+       
+       
+        <div class="grid-2">
+          <label class="field">
+            <span>First Name <strong>*</strong></span>
+            <input type="text" name="firstName" required />
+          </label>
+       
+       
+          <label class="field">
+            <span>Student Grade Level <strong>*</strong></span>
+            <select name="gradeLevel" required>
+              <option value="" selected disabled>Choose</option>
+              <option>9th Grade</option>
+              <option>10th Grade</option>
+              <option>11th Grade</option>
+              <option>12th Grade</option>
+            </select>
+          </label>
+        </div>
+       
+       
+        <label class="field">
+          <span>
+            When would you like to make an appointment? <strong>*</strong><br>
+            <small>
+              Before selecting your appointment, PLEASE make sure this date and time works for your schedule.
+              By submitting this form, you are committing to this appointment.
+              If no appointments are available for the day you'd like to visit, please come as a walk-in to Room 212.
+            </small>
+          </span>
+          <input type="datetime-local" name="appointmentDateTime" required />
+        </label>
+       
+       
+        <label class="field">
+          <span>What is the name of the teacher who gave this writing assignment? <strong>*</strong></span>
+          <input type="text" name="assignmentTeacher" required />
+        </label>
+       
+       
+        <label class="field">
+          <span>
+            What subject and level is the course for which you are completing this writing assignment?
+            (Example: English 12AP) <strong>*</strong>
+          </span>
+          <input type="text" name="courseInfo" required />
+        </label>
+
+        <label class="field">
+          <span>What type of writing assignment are you bringing? <strong>*</strong></span>
+          <select name="assignmentType" required>
+            <option value="" selected disabled>Choose</option>
+            <option>Analytical Essay</option>
+            <option>Argumentative/Persuasive Essay</option>
+            <option>Narrative/College Essay</option>
+            <option>CIT Paper/Proposal</option>
+            <option>Science Report</option>
+            <option>History Paper</option>
+            <option>Creative Writing</option>
+            <option>Research Paper</option>
+            <option>Oral Presentation</option>
+            <option>Other</option>
+          </select>
+         </label>
+
+        <label class="field">
+          <span>
+            If possible, please include a link to a Google Document of your writing assignment
+            so your consultant can review it in advance.
+          </span>
+          <input type="url" name="googleDocLink" placeholder="Paste Google Docs link here" />
+        </label>
+       
+       
+        <div class="actions">
+          <button class="btn primary" type="submit">
+            Submit
+          </button>
+          <button class="btn ghost" type="reset">
+            Reset
+          </button>
+        </div>
+       
+       
+       </form>
+              
+    </section>
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
   </footer>
-  
+  <script src="theme-toggle.js"></script>
 </body>
 
 </html>
