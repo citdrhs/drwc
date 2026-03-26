@@ -88,12 +88,35 @@
           <input type="datetime-local" name="appointmentDateTime" required />
         </label>
 
+        <!-- Teacher Selection -->
         <label class="field">
           <span>What is the name of the teacher who gave this writing assignment? <strong>*</strong></span>
           <select name="teacherEmail" id="signup-teacher-email" required>
             <option value="" selected disabled>Loading teachers...</option>
           </select>
         </label>
+
+        <!-- Teacher Not Listed Toggle -->
+        <div class="field">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" id="teacher-not-listed-toggle" style="width: auto;">
+            <span>My teacher isn't listed</span>
+          </label>
+        </div>
+
+        <!-- Manual Teacher Entry (hidden by default) -->
+        <div id="manual-teacher-fields">
+          <div class="grid-2">
+            <label class="field">
+              <span>Teacher Name <strong>*</strong></span>
+              <input type="text" id="manual-teacher-name" name="manualTeacherName" placeholder="e.g., Mr. Smith" />
+            </label>
+            <label class="field">
+              <span>Teacher Email <strong>*</strong></span>
+              <input type="email" id="manual-teacher-email" name="manualTeacherEmail" placeholder="teacher@henrico.k12.va.us" />
+            </label>
+          </div>
+        </div>
 
         <label class="field">
           <span>
