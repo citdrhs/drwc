@@ -194,3 +194,79 @@ document.addEventListener("DOMContentLoaded", async function () {
     await loadSignupOptions();
   }
 });
+
+// ── Login page (login.html) ───────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", function () {
+  const pwInput  = document.getElementById("login-password");
+  const loginBtn = document.getElementById("login-btn");
+  const msgEl    = document.getElementById("login-message");
+  const pwToggle = document.getElementById("pw-toggle");
+
+  if (!pwInput || !loginBtn || !msgEl || !pwToggle) return; // not on login page
+
+  const SESSION_KEY = "wc_consultant_auth";
+
+  pwToggle.addEventListener("click", function () {
+    const hidden = pwInput.type === "password";
+    pwInput.type = hidden ? "text" : "password";
+    pwToggle.textContent = hidden ? "🙈" : "👁";
+  });
+
+  pwInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") handleLogin();
+  });
+
+  loginBtn.addEventListener("click", handleLogin);
+
+  async function handleLogin() {
+    const password = pwInput.value.trim();
+    if (!password) {
+      showMsg("Please enter your access code.", "error");
+      return;
+    }
+
+    setLoading(true);
+    showMsg("Checking...", "info");
+
+    try {
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "checkPassword");
+      url.searchParams.set("password", password);
+
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" }
+      });
+
+      if (!res.ok) throw new Error("Network error");
+      const data = await res.json();
+
+      if (data.ok) {
+        sessionStorage.setItem(SESSION_KEY, "true");
+        showMsg("Access granted! Redirecting...", "info");
+        setTimeout(function () {
+          window.location.href = "./consultant-form.html";
+        }, 800);
+      } else {
+        showMsg("Incorrect access code. Please try again.", "error");
+        pwInput.value = "";
+        pwInput.focus();
+      }
+    } catch (err) {
+      showMsg("Could not reach the server. Check your connection.", "error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = "login-message " + type;
+  }
+
+  function setLoading(state) {
+    loginBtn.disabled = state;
+    loginBtn.textContent = state ? "Checking..." : "Enter";
+  }
+});
