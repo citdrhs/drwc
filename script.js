@@ -38,12 +38,14 @@ function renderTeacherOptions(teachers) {
   const select = document.getElementById("signup-teacher-email");
   if (!select) return;
   select.innerHTML = "";
+
   const placeholder = document.createElement("option");
   placeholder.value = "";
   placeholder.textContent = "Choose a teacher";
   placeholder.disabled = true;
   placeholder.selected = true;
   select.appendChild(placeholder);
+
   teachers.forEach(function (teacher) {
     const option = document.createElement("option");
     option.value = teacher.email;
