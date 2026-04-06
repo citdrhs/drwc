@@ -35,8 +35,12 @@ async function apiPost(action, payload) {
 // ── Signup form (signups.html) ────────────────────────────────────────────────
 
 function renderTeacherOptions(teachers) {
-  const select = document.getElementById("signup-teacher-email");
+  const select      = document.getElementById("signup-teacher-email");
+  const manualFields = document.getElementById("manual-teacher-fields");
+  const nameInput   = document.getElementById("manual-teacher-name");
+  const emailInput  = document.getElementById("manual-teacher-email");
   if (!select) return;
+
   select.innerHTML = "";
 
   const placeholder = document.createElement("option");
@@ -51,6 +55,25 @@ function renderTeacherOptions(teachers) {
     option.value = teacher.email;
     option.textContent = teacher.name + " (" + teacher.email + ")";
     select.appendChild(option);
+  });
+
+  // Add "not listed" option at the bottom
+  const notListed = document.createElement("option");
+  notListed.value = "not_listed";
+  notListed.textContent = "My teacher isn't listed...";
+  select.appendChild(notListed);
+
+  // Show/hide manual fields based on selection
+  select.addEventListener("change", function () {
+    if (select.value === "not_listed") {
+      manualFields.style.display = "block";
+      nameInput.required  = true;
+      emailInput.required = true;
+    } else {
+      manualFields.style.display = "none";
+      nameInput.required  = false;
+      emailInput.required = false;
+    }
   });
 }
 
@@ -76,14 +99,32 @@ function bindSignupForm() {
   const form = document.getElementById("signup-form");
   if (!form) return;
 
+  const manualFields  = document.getElementById("manual-teacher-fields");
+  const nameInput     = document.getElementById("manual-teacher-name");
+  const emailInput    = document.getElementById("manual-teacher-email");
+  const teacherSelect = document.getElementById("signup-teacher-email");
+
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
     showMessage("signup-message", "Submitting...", false);
 
     const fd = new FormData(form);
-    const firstName = (fd.get("firstName") || "").trim();
-    const lastName  = (fd.get("lastName")  || "").trim();
+    const firstName   = (fd.get("firstName") || "").trim();
+    const lastName    = (fd.get("lastName")  || "").trim();
     const studentName = (firstName + " " + lastName).trim();
+
+    const isNewTeacher = teacherSelect.value === "not_listed";
+    const teacherEmail = isNewTeacher
+      ? (fd.get("manualTeacherEmail") || "").trim()
+      : fd.get("teacherEmail");
+    const teacherName = isNewTeacher
+      ? (fd.get("manualTeacherName") || "").trim()
+      : null;
+
+    if (isNewTeacher && (!teacherEmail || !teacherName)) {
+      showMessage("signup-message", "Please enter your teacher's name and email.", true);
+      return;
+    }
 
     try {
       const res = await apiPost("submitSignup", {
@@ -91,16 +132,29 @@ function bindSignupForm() {
         student_email:    fd.get("studentEmail"),
         student_grade:    fd.get("studentGrade"),
         appointment_date: fd.get("appointmentDateTime"),
-        teacher_email:    fd.get("teacherEmail"),
+        teacher_email:    teacherEmail,
+        teacher_name:     teacherName,
         course:           fd.get("courseInfo"),
         assignment_type:  fd.get("assignmentType"),
         google_doc_link:  fd.get("googleDocLink") || "",
-        dual_enroll:      fd.get("dualEnroll") === "true"
+        is_new_teacher:   isNewTeacher
       });
 
       if (res.ok) {
         showMessage("signup-message", "Sign-up submitted! Confirmation ID: " + res.consult_id, false);
+
+        // Reset form
         form.reset();
+        manualFields.style.display = "none";
+        nameInput.required  = false;
+        emailInput.required = false;
+
+        // Reset teacher dropdown back to placeholder
+        const teacherSelect = document.getElementById("signup-teacher-email");
+        if (teacherSelect) teacherSelect.selectedIndex = 0;
+
+        // Reload appointments so spot count updates
+        await loadAppointments();
       } else {
         showMessage("signup-message", res.error || "Submission failed.", true);
       }
@@ -163,11 +217,12 @@ function bindConsultationForm() {
         consultant:  fd.get("consultantName"),
         before_conf: fd.get("beforeConfidence"),
         after_conf:  fd.get("afterConfidence"),
-        duration:    Number(fd.get("duration")),
+        duration: Number(fd.get("duration")) || 0,
+        dual_enroll: fd.get("dualEnroll") === "true",
         due_date:    fd.get("dueDate"),
         notes:       fd.get("workedOn"),
         next_steps:  fd.get("nextSteps"),
-        password:    fd.get("password")
+        password:    ""
       });
 
       if (res.ok) {
@@ -183,17 +238,62 @@ function bindConsultationForm() {
   });
 }
 
+async function loadAppointments() {
+  const select = document.getElementById("appointment-select");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("getAppointments");
+    const appointments = data.appointments || [];
+
+    select.innerHTML = "";
+
+    if (appointments.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No appointments available";
+      opt.disabled = true;
+      opt.selected = true;
+      select.appendChild(opt);
+      return;
+    }
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Choose an appointment";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    appointments.forEach(function (appt) {
+      const option = document.createElement("option");
+      option.value = appt.description;
+      option.textContent = appt.description + " (" + appt.spots_left + " spot" + (appt.spots_left === 1 ? "" : "s") + " left)";
+      select.appendChild(option);
+    });
+
+  } catch (err) {
+    select.innerHTML = "";
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Could not load appointments";
+    opt.disabled = true;
+    opt.selected = true;
+    select.appendChild(opt);
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", async function () {
   if (document.getElementById("signup-form")) {
     bindSignupForm();
-    await loadTeachers();
+    await Promise.all([loadTeachers(), loadAppointments()]);
   }
 
   if (document.getElementById("consultant-form")) {
     bindConsultationForm();
-    await loadSignupOptions();
+    await Promise.all([loadSignupOptions(), loadConsultants()]);
   }
 });
 
@@ -212,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
   pwToggle.addEventListener("click", function () {
     const hidden = pwInput.type === "password";
     pwInput.type = hidden ? "text" : "password";
-    pwToggle.textContent = hidden ? "🙈" : "👁";
+    pwToggle.textContent = hidden ? "Hide" : "Show";
   });
 
   pwInput.addEventListener("keydown", function (e) {
@@ -272,3 +372,49 @@ document.addEventListener("DOMContentLoaded", function () {
     loginBtn.textContent = state ? "Checking..." : "Enter";
   }
 });
+
+//loading consultants 
+async function loadConsultants() {
+  const select = document.getElementById("consultant-name-select");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("getConsultants");
+    const consultants = data.consultants || [];
+
+    select.innerHTML = "";
+
+    if (consultants.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No consultants found";
+      opt.disabled = true;
+      opt.selected = true;
+      select.appendChild(opt);
+      return;
+    }
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select your name";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    consultants.forEach(function (name) {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+
+  } catch (err) {
+    select.innerHTML = "";
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Could not load consultants";
+    opt.disabled = true;
+    opt.selected = true;
+    select.appendChild(opt);
+  }
+}

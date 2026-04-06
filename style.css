@@ -778,7 +778,9 @@ body.light-mode .footer a {
   border: none;
   color: var(--muted);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   padding: 0;
   line-height: 1;
   transition: color 0.2s;
@@ -839,3 +841,10 @@ body.light-mode .footer a {
 .back-link:hover {
   color: var(--primary2);
 }
+
+/* .radio-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+} */

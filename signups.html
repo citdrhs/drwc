@@ -85,7 +85,9 @@
               If no appointments are available for the day you'd like to visit, please come as a walk-in to Room 212.
             </small>
           </span>
-          <input type="datetime-local" name="appointmentDateTime" required />
+          <select name="appointmentDateTime" id="appointment-select" required>
+            <option value="" selected disabled>Loading available appointments...</option>
+          </select>
         </label>
 
         <!-- Teacher Selection -->
@@ -105,7 +107,7 @@
         </div>
 
         <!-- Manual Teacher Entry (hidden by default) -->
-        <div id="manual-teacher-fields">
+        <div id="manual-teacher-fields" style="display:none;">
           <div class="grid-2">
             <label class="field">
               <span>Teacher Name <strong>*</strong></span>
@@ -150,14 +152,6 @@
           </span>
           <input type="url" name="googleDocLink" placeholder="Paste Google Docs link here" />
         </label>
-
-        <div class="field">
-          <span>Dual Enrollment Student? <strong>*</strong></span>
-          <div class="radio-row">
-            <label><input type="radio" name="dualEnroll" value="true" required /> Yes</label>
-            <label><input type="radio" name="dualEnroll" value="false" required /> No</label>
-          </div>
-        </div>
 
         <div class="actions">
           <button class="btn primary" type="submit">

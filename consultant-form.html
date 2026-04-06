@@ -8,6 +8,11 @@
 </head>
 
 <body id="consultantform">
+  <script>
+  if (!sessionStorage.getItem("wc_consultant_auth")) {
+    window.location.replace("./login.html");
+  }
+  </script>
   <!-- navbar, put on each page -->
   <nav>
     <a id="navlogo_link" href="./index.html"> <img id="navlogo" src="./Images/Logo.png"> </a>
@@ -16,7 +21,7 @@
     <a href="./media.html"> Media </a>
     <a href="./resources.html"> Resources </a>
     <a href="./applications.html"> Consultant Applications </a>
-    <a href="./consultant-form.html"> Consultant Form </a>
+    <a href="./login.html">Consultant Login</a>
     <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"> <img id="drhslogo" src="./Images/drhslogo.png"> </a>
   </nav>
 
@@ -43,8 +48,10 @@
         </label>
 
         <label class="field">
-          <span>Consultant's Name (First and Last) <strong>*</strong></span>
-          <input type="text" name="consultantName" required />
+          <span>Consultant's Name <strong>*</strong></span>
+          <select name="consultantName" id="consultant-name-select" required>
+            <option value="" selected disabled>Loading consultants...</option>
+          </select>
         </label>
 
         <label class="field">
@@ -76,27 +83,40 @@
           </label>
         </div>
 
-        <div class="field">
-          <span>Consultation Duration <strong>*</strong></span>
-          <div class="radio-row">
-            <label><input type="radio" name="duration" value="30" required /> 30 min</label>
-            <label><input type="radio" name="duration" value="60" required /> 60 min</label>
+        <div class="grid-2" style="align-items: start;">
+          <div class="field">
+            <span>Consultation Duration <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>Dual Enrollment Student? <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
+              </label>
+            </div>
           </div>
         </div>
 
         <label class="field">
-          <span>What aspects of writing did you work on today? <strong>*</strong></span>
+          <span>What aspects of writing did you work on today? (Shared with the student)<strong>*</strong></span>
           <textarea name="workedOn" rows="4" required></textarea>
         </label>
 
         <label class="field">
-          <span>Next steps for the writer <strong>*</strong></span>
+          <span>Next steps for the writer (Shared with the student)<strong>*</strong></span>
           <textarea name="nextSteps" rows="4" required></textarea>
-        </label>
-
-        <label class="field">
-          <span>Consultant Password <strong>*</strong></span>
-          <input type="password" name="password" required />
         </label>
 
         <div class="actions">
