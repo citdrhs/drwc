@@ -848,3 +848,138 @@ body.light-mode .footer a {
   align-items: center;
   flex-wrap: wrap;
 } */
+
+/* ── Consultant Form — Tab Switcher ────────────────────────────── */
+
+.cf-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.cf-tab-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: .15s ease;
+}
+
+.cf-tab-btn:hover {
+  background: rgba(255,255,255,.06);
+}
+
+.cf-tab-btn.active {
+  border-color: rgba(124,156,255,.55);
+  background: rgba(124,156,255,.18);
+  color: var(--primary2);
+}
+
+.noshow-preview {
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 4px;
+  display: grid;
+  gap: 8px;
+}
+
+.noshow-preview-row {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  align-items: baseline;
+}
+
+.noshow-preview-label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+
+.btn-noshow {
+  border-color: rgba(255, 100, 100, .45);
+  background: rgba(255, 100, 100, .12);
+  color: #ffb4b4;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,100,100,.45);
+  cursor: pointer;
+  transition: .15s ease;
+  font-size: 14px;
+}
+
+.btn-noshow:hover:not(:disabled) {
+  background: rgba(255, 100, 100, .22);
+}
+
+.btn-noshow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+.radio-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+
+body.light-mode .noshow-preview {
+  background: rgba(0,0,0,.04);
+}
+
+body.light-mode .btn-noshow {
+  color: #c0392b;
+  border-color: rgba(192,57,43,.45);
+  background: rgba(192,57,43,.10);
+}
+
+body.light-mode .btn-noshow:hover:not(:disabled) {
+  background: rgba(192,57,43,.18);
+}
+
+/* revert section for no show tab  */
+
+.btn-revert {
+  border-color: rgba(124, 156, 255, .45);
+  background: rgba(124, 156, 255, .12);
+  color: #9fb4ff;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(124,156,255,.45);
+  cursor: pointer;
+  transition: .15s ease;
+  font-size: 14px;
+}
+
+.btn-revert:hover:not(:disabled) {
+  background: rgba(124, 156, 255, .22);
+}
+
+.btn-revert:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+body.light-mode .btn-revert {
+  color: #233e90;
+  border-color: rgba(35,62,144,.45);
+  background: rgba(35,62,144,.10);
+}
+
+body.light-mode .btn-revert:hover:not(:disabled) {
+  background: rgba(35,62,144,.18);
+}

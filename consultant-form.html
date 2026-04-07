@@ -4,16 +4,18 @@
 <head>
   <title>Writing Center | Consultant Form</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="consultant-form.css" rel="stylesheet" type="text/css" />
   <link rel="icon" href="Images/Logo.png">
 </head>
 
 <body id="consultantform">
-  <script>
-  if (!sessionStorage.getItem("wc_consultant_auth")) {
+<script>
+  const _session = JSON.parse(sessionStorage.getItem("wc_consultant_session") || "null");
+  if (!_session || !_session.name) {
     window.location.replace("./login.html");
   }
-  </script>
-  <!-- navbar, put on each page -->
+</script>
+
   <nav>
     <a id="navlogo_link" href="./index.html"> <img id="navlogo" src="./Images/Logo.png"> </a>
     <a href="./signups.html"> Sign-Ups </a>
@@ -27,15 +29,26 @@
 
   <main class="container">
     <div class="card" id="calendarintro">
-      <h2>Writing Center Consultant Form</h2>
-      <p>Please fill out this form after each consultation session. This helps us track appointments and improve our services.</p>
+      <h2>Writing Center Consultant Portal</h2>
+      <p>Use the tabs below to submit a session report or manage no-shows.</p>
       <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
     </div>
 
-    <!-- Consultant form -->
-    <section id="tab-consultant" class="tab-panel active" role="tabpanel">
+    <!-- Tab buttons -->
+    <div class="cf-tabs" role="tablist">
+      <button class="cf-tab-btn active" id="btn-session" role="tab" aria-selected="true" aria-controls="tab-session" onclick="switchTab('session')">
+        Session Report
+      </button>
+      <button class="cf-tab-btn" id="btn-noshow" role="tab" aria-selected="false" aria-controls="tab-noshow" onclick="switchTab('noshow')">
+        Mark No-Show
+      </button>
+    </div>
+
+    <!-- TAB 1: Session Report -->
+    <section id="tab-session" class="tab-panel active" role="tabpanel">
       <div class="panel-head">
         <h2>Consultant Session Report</h2>
+        <p>Fill this out after each consultation session.</p>
       </div>
 
       <form id="consultant-form" class="card">
@@ -55,7 +68,7 @@
         </label>
 
         <label class="field">
-          <span>DUE DATE for this writing assignment <strong>*</strong></span>
+          <span>Due date for this writing assignment <strong>*</strong></span>
           <input type="date" name="dueDate" required />
         </label>
 
@@ -110,28 +123,96 @@
         </div>
 
         <label class="field">
-          <span>What aspects of writing did you work on today? (Shared with the student)<strong>*</strong></span>
+          <span>What aspects of writing did you work on today? (Shared with the student) <strong>*</strong></span>
           <textarea name="workedOn" rows="4" required></textarea>
         </label>
 
         <label class="field">
-          <span>Next steps for the writer (Shared with the student)<strong>*</strong></span>
+          <span>Next steps for the writer (Shared with the student) <strong>*</strong></span>
           <textarea name="nextSteps" rows="4" required></textarea>
         </label>
 
         <div class="actions">
-          <button class="btn primary" type="submit">
-            Submit
-          </button>
-          <button class="btn ghost" type="reset">
-            Reset
+          <button class="btn primary" type="submit">Submit Session</button>
+          <button class="btn ghost" type="reset">Reset</button>
+        </div>
+
+        <div class="toast" id="consultant-message"></div>
+      </form>
+    </section>
+
+    <!-- TAB 2: Mark No-Show + Revert -->
+    <section id="tab-noshow" class="tab-panel" role="tabpanel">
+
+      <!-- Mark No-Show -->
+      <div class="panel-head">
+        <h2>Mark No-Show</h2>
+        <p>Select a student who did not show up for their appointment. This will remove them from the sign-up list.</p>
+      </div>
+
+      <div class="card" id="noshow-form">
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select id="noshow-id-select">
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <!-- Preview of selected sign-up details -->
+        <div id="noshow-preview" class="noshow-preview" style="display:none;">
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Student</span>
+            <span id="preview-student"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Appointment</span>
+            <span id="preview-appt"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Course</span>
+            <span id="preview-course"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Teacher</span>
+            <span id="preview-teacher"></span>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top: 16px;">
+          <button class="btn btn-noshow" id="noshow-btn" onclick="submitNoShow()" disabled>
+            Mark as No-Show
           </button>
         </div>
 
-        <div class="message" id="consultant-message"></div>
+        <div class="toast" id="noshow-message"></div>
 
-      </form>
+        <!-- Revert No-Show -->
+        <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line);">
+          <div class="panel-head">
+            <h2>Revert a No-Show</h2>
+            <p>If you accidentally marked a student as a no-show, select them below to restore their sign-up.</p>
+          </div>
+
+          <label class="field">
+            <span>Select No-Show to Revert</span>
+            <select id="revert-id-select">
+              <option value="" selected disabled>Loading no-shows...</option>
+            </select>
+          </label>
+
+          <div class="actions" style="margin-top: 16px;">
+            <button class="btn btn-revert" id="revert-btn" onclick="submitRevert()" disabled>
+              Revert to Scheduled
+            </button>
+          </div>
+
+          <div class="toast" id="revert-message"></div>
+        </div>
+
+      </div>
     </section>
+
   </main>
 
   <footer class="footer">
@@ -146,6 +227,7 @@
   </footer>
 
   <script src="theme-toggle.js"></script>
-  <script src="script.js"></script></body>
+  <script src="script.js"></script>
+</body>
 
 </html>
