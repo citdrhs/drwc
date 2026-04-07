@@ -5,6 +5,139 @@
   <title>Writing Center | Consultant Login</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="icon" href="Images/Logo.png">
+  <style>
+    .login-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 60px);
+      padding: 24px 18px;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .login-logo img { height: 40px; width: auto; }
+
+    .login-logo-text h2 {
+      margin: 0;
+      padding: 0;
+      font-size: 17px;
+      color: var(--text);
+    }
+
+    .login-logo-text p {
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .login-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 0 0 24px;
+    }
+
+    .login-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 6px;
+      padding: 0;
+      color: var(--primary2);
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 24px;
+      padding: 0;
+      line-height: 1.5;
+    }
+
+    .login-field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+
+    .login-field label { font-size: 13px; color: var(--muted); }
+
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+
+    .pw-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .pw-toggle:hover { color: var(--primary2); }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 156, 255, .55);
+      background: rgba(124, 156, 255, .18);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 4px;
+    }
+
+    .login-btn:hover { background: rgba(124, 156, 255, .28); }
+    .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .login-message {
+      margin-top: 14px;
+      font-size: 13px;
+      min-height: 18px;
+      text-align: center;
+    }
+
+    .login-message.error { color: #ffb4b4; }
+    .login-message.info  { color: var(--primary2); }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--primary2); }
+  </style>
 </head>
 
 <body>
@@ -21,7 +154,6 @@
 
   <div class="login-wrapper">
     <div class="login-card">
-
       <div class="login-logo">
         <img src="./Images/Logo.png" alt="Writing Center Logo">
         <div class="login-logo-text">
@@ -33,25 +165,28 @@
       <hr class="login-divider">
 
       <h2 class="login-title">Consultant Login</h2>
-      <p class="login-subtitle">Enter your access code to open the Consultant Form.</p>
+      <p class="login-subtitle">Enter your credentials to access your dashboard.</p>
 
       <div class="login-field">
-        <label for="login-password">Access Code</label>
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" placeholder="Enter username" autocomplete="off" />
+      </div>
+
+      <div class="login-field">
+        <label for="login-password">Password</label>
         <div class="pw-wrap">
-          <input type="password" id="login-password" placeholder="Enter access code" autocomplete="off" />
-          <button class="pw-toggle" id="pw-toggle" type="button" aria-label="Toggle visibility"><p>Show</p></button>
+          <input type="password" id="login-password" placeholder="Enter password" autocomplete="off" />
+          <button class="pw-toggle" id="pw-toggle" type="button">Show</button>
         </div>
       </div>
 
       <button class="login-btn" id="login-btn">Enter</button>
       <div class="login-message" id="login-message"></div>
       <a class="back-link" href="./index.html">← Back to Writing Center Home</a>
-
     </div>
   </div>
 
   <script src="theme-toggle.js"></script>
   <script src="script.js"></script>
 </body>
-
 </html>

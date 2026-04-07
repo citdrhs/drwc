@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Writing Center | My Dashboard</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="Images/Logo.png">
+  <style>
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .dash-header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--primary2);
+    }
+
+    .dash-header p {
+      margin: 0;
+      padding: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--primary2);
+      line-height: 1;
+    }
+
+    .stat-unit {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 900px;
+    }
+
+    thead tr {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--card);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .badge-yes {
+      background: rgba(100, 200, 150, .15);
+      color: #6fcf97;
+      border: 1px solid rgba(100, 200, 150, .3);
+    }
+
+    .badge-no {
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .conf-arrow {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 4px;
+    }
+
+    .conf-up { color: #6fcf97; }
+    .conf-same { color: var(--muted); }
+    .conf-down { color: #ffb4b4; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      border: 1px solid rgba(255, 100, 100, .45);
+      background: rgba(255, 100, 100, .10);
+      color: #ffb4b4;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: .15s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 100, 100, .20);
+    }
+
+    body.light-mode .logout-btn {
+      color: #c0392b;
+      border-color: rgba(192,57,43,.45);
+      background: rgba(192,57,43,.08);
+    }
+
+    body.light-mode .logout-btn:hover {
+      background: rgba(192,57,43,.16);
+    }
+
+    body.light-mode .badge-yes {
+      background: rgba(39,174,96,.12);
+      color: #27ae60;
+      border-color: rgba(39,174,96,.3);
+    }
+
+    body.light-mode .conf-up { color: #27ae60; }
+    body.light-mode .conf-down { color: #e74c3c; }
+
+    body.light-mode tbody tr:hover {
+      background: rgba(0,0,0,.03);
+    }
+
+    @media (max-width: 640px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .dash-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    if (!sessionStorage.getItem("wc_dashboard_consultant")) {
+      window.location.replace("./consultant-login.html");
+    }
+  </script>
+
+  <nav>
+    <a id="navlogo_link" href="./index.html"><img id="navlogo" src="./Images/Logo.png"></a>
+    <a href="./signups.html">Sign-Ups</a>
+    <a href="./consultants.html">Staff</a>
+    <a href="./media.html">Media</a>
+    <a href="./resources.html">Resources</a>
+    <a href="./applications.html">Consultant Applications</a>
+    <a href="./login.html">Consultant Login</a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"><img id="drhslogo" src="./Images/drhslogo.png"></a>
+  </nav>
+
+  <main class="container">
+
+    <!-- Header -->
+    <div class="card">
+      <div class="dash-header">
+        <div>
+          <h2 id="dash-greeting">My Dashboard</h2>
+          <p id="dash-subtext">Loading your data...</p>
+        </div>
+        <button class="logout-btn" onclick="logoutConsultant()">Log Out</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Consultations</div>
+        <div class="stat-value" id="stat-consults">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Hours</div>
+        <div class="stat-value" id="stat-hours">—</div>
+        <div class="stat-unit">hrs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Minutes</div>
+        <div class="stat-value" id="stat-minutes">—</div>
+        <div class="stat-unit">min</div>
+      </div>
+    </div>
+
+    <!-- Consultation History Table -->
+    <div class="panel-head">
+      <h2>Consultation History</h2>
+    </div>
+
+    <div class="table-wrap card" style="padding: 0;">
+      <div class="loading-state" id="table-loading">Loading consultations...</div>
+      <table id="dash-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Student</th>
+            <th>Grade</th>
+            <th>Teacher</th>
+            <th>Course</th>
+            <th>Assignment</th>
+            <th>Duration</th>
+            <th>Confidence</th>
+            <th>Dual Enroll</th>
+            <th>Notes</th>
+            <th>Next Steps</th>
+          </tr>
+        </thead>
+        <tbody id="dash-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="table-empty" style="display:none;">No consultations found.</div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
+  </footer>
+
+  <script src="theme-toggle.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Writing Center | Consultant Dashboard Login</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="Images/Logo.png">
+</head>
+
+<body>
+  <script>
+    // If already logged in, skip login page
+    if (sessionStorage.getItem("wc_dashboard_consultant")) {
+      window.location.replace("./consultant-dashboard.html");
+    }
+  </script>
+
+  <nav>
+    <a id="navlogo_link" href="./index.html"><img id="navlogo" src="./Images/Logo.png"></a>
+    <a href="./signups.html">Sign-Ups</a>
+    <a href="./consultants.html">Staff</a>
+    <a href="./media.html">Media</a>
+    <a href="./resources.html">Resources</a>
+    <a href="./applications.html">Consultant Applications</a>
+    <a href="./login.html">Consultant Login</a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"><img id="drhslogo" src="./Images/drhslogo.png"></a>
+  </nav>
+
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <img src="./Images/Logo.png" alt="Writing Center Logo">
+        <div class="login-logo-text">
+          <h2>Deep Run Writing Center</h2>
+          <p>Consultant Dashboard</p>
+        </div>
+      </div>
+
+      <hr class="login-divider">
+
+      <h2 class="login-title">Consultant Login</h2>
+      <p class="login-subtitle">Enter your username and password to view your dashboard.</p>
+
+      <div class="login-field">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
+      </div>
+
+      <div class="login-field">
+        <label for="login-password">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-password" placeholder="Enter your password" autocomplete="off" />
+          <button class="pw-toggle" id="pw-toggle" type="button" aria-label="Toggle visibility">Show</button>
+        </div>
+      </div>
+
+      <button class="login-btn" id="login-btn">Enter</button>
+      <div class="login-message" id="login-message"></div>
+      <a class="back-link" href="./index.html">← Back to Writing Center Home</a>
+
+    </div>
+  </div>
+
+  <script src="theme-toggle.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
