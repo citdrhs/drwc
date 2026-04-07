@@ -628,11 +628,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     loadStats(session.name),
     loadHistory(session.name),
     loadSignupOptions(),
-    loadConsultants(session.name)
+    loadConsultants(session.name),
+    loadNoShowOptions(),
+    loadRevertOptions()
   ]);
 
   // Bind form
   bindConsultationForm();
+  // Wire up no show buttons
+  const noshowBtn = document.getElementById("noshow-btn");
+  const revertBtn = document.getElementById("revert-btn");
+  if (noshowBtn) noshowBtn.addEventListener("click", submitNoShow);
+  if (revertBtn) revertBtn.addEventListener("click", submitRevert);
 });
 
 async function loadStats(name) {
@@ -721,5 +728,140 @@ async function loadConsultants(preselect) {
 
   } catch (err) {
     select.innerHTML = "<option disabled selected>Could not load</option>";
+  }
+}
+
+// ── No Show (consultant-dashboard.html) ──────────────────────────────────────
+
+async function loadNoShowOptions() {
+  const select = document.getElementById("noshow-id-select");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("signupOptions");
+    const options = data.options || [];
+
+    select.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = options.length ? "Choose a sign-up" : "No open sign-ups";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    options.forEach(function (opt) {
+      const option = document.createElement("option");
+      option.value = opt.consult_id;
+      option.textContent = opt.label;
+      option.dataset.student = opt.student_name;
+      option.dataset.appt    = opt.date;
+      option.dataset.course  = opt.course || '';
+      option.dataset.teacher = opt.teacher_email;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", function () {
+      const selected = select.options[select.selectedIndex];
+      document.getElementById("preview-student").textContent = selected.dataset.student || '—';
+      document.getElementById("preview-appt").textContent    = selected.dataset.appt    || '—';
+      document.getElementById("preview-course").textContent  = selected.dataset.course  || '—';
+      document.getElementById("preview-teacher").textContent = selected.dataset.teacher || '—';
+      document.getElementById("noshow-preview").style.display = "block";
+      document.getElementById("noshow-btn").disabled = false;
+    });
+
+  } catch (err) {
+    select.innerHTML = "<option disabled selected>Could not load sign-ups</option>";
+  }
+}
+
+async function loadRevertOptions() {
+  const select = document.getElementById("revert-id-select");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("noShowOptions");
+    const options = data.options || [];
+
+    select.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = options.length ? "Choose a no-show" : "No no-shows recorded";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    options.forEach(function (opt) {
+      const option = document.createElement("option");
+      option.value = opt.consult_id;
+      option.textContent = opt.label;
+      select.appendChild(option);
+    });
+
+    select.addEventListener("change", function () {
+      document.getElementById("revert-btn").disabled = !select.value;
+    });
+
+  } catch (err) {
+    select.innerHTML = "<option disabled selected>Could not load no-shows</option>";
+  }
+}
+
+async function submitNoShow() {
+  const select  = document.getElementById("noshow-id-select");
+  const msgEl   = document.getElementById("noshow-message");
+  const btn     = document.getElementById("noshow-btn");
+  if (!select.value) return;
+
+  btn.disabled = true;
+  btn.textContent = "Marking...";
+  msgEl.textContent = "";
+
+  try {
+    const res = await apiPost("markNoShow", { consult_id: select.value });
+    if (res.ok) {
+      msgEl.textContent = "Marked as no-show successfully.";
+      msgEl.style.color = "var(--primary2)";
+      document.getElementById("noshow-preview").style.display = "none";
+      await Promise.all([loadNoShowOptions(), loadRevertOptions(), loadSignupOptions()]);
+    } else {
+      msgEl.textContent = res.error || "Failed to mark no-show.";
+      msgEl.style.color = "#ffb4b4";
+    }
+  } catch (err) {
+    msgEl.textContent = err.message;
+    msgEl.style.color = "#ffb4b4";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Mark as No-Show";
+  }
+}
+
+async function submitRevert() {
+  const select = document.getElementById("revert-id-select");
+  const msgEl  = document.getElementById("revert-message");
+  const btn    = document.getElementById("revert-btn");
+  if (!select.value) return;
+
+  btn.disabled = true;
+  btn.textContent = "Reverting...";
+  msgEl.textContent = "";
+
+  try {
+    const res = await apiPost("revertNoShow", { consult_id: select.value });
+    if (res.ok) {
+      msgEl.textContent = "Reverted to scheduled successfully.";
+      msgEl.style.color = "var(--primary2)";
+      await Promise.all([loadNoShowOptions(), loadRevertOptions(), loadSignupOptions()]);
+    } else {
+      msgEl.textContent = res.error || "Failed to revert.";
+      msgEl.style.color = "#ffb4b4";
+    }
+  } catch (err) {
+    msgEl.textContent = err.message;
+    msgEl.style.color = "#ffb4b4";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Revert to Scheduled";
   }
 }

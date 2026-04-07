@@ -53,7 +53,7 @@
       color: #ffb4b4;
     }
 
-    /* Stats cards */
+    /* Stats */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -85,10 +85,7 @@
       margin-bottom: 4px;
     }
 
-    .stat-sub {
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .stat-sub { font-size: 12px; color: var(--muted); }
 
     /* Tabs */
     .tabs {
@@ -97,6 +94,7 @@
       margin-bottom: 20px;
       border-bottom: 1px solid var(--line);
       padding-bottom: 0;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
@@ -112,32 +110,20 @@
     }
 
     .tab-btn:hover { color: var(--text); }
-
-    .tab-btn.active {
-      color: var(--primary2);
-      border-bottom-color: var(--primary2);
-    }
+    .tab-btn.active { color: var(--primary2); border-bottom-color: var(--primary2); }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* Table */
+    /* History table */
     .table-wrap {
       overflow-x: auto;
       border-radius: var(--radius);
       border: 1px solid var(--line);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    thead {
-      background: var(--card);
-      border-bottom: 1px solid var(--line);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: var(--card); border-bottom: 1px solid var(--line); }
 
     th {
       padding: 12px 14px;
@@ -157,44 +143,63 @@
     }
 
     tbody tr:last-child td { border-bottom: none; }
-
     tbody tr:hover { background: var(--card); }
 
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-size: 11px;
-      font-weight: 600;
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .badge-yes { background: rgba(124,156,255,.18); color: var(--primary2); }
+    .badge-no  { background: rgba(255,255,255,.06); color: var(--muted); }
+
+    .empty-state, .loading-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 14px;
     }
 
-    .badge-yes {
-      background: rgba(124,156,255,.18);
+    /* No show preview */
+    .noshow-preview {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+
+    .noshow-preview-row {
+      display: flex;
+      gap: 12px;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+
+    .noshow-preview-label {
+      color: var(--muted);
+      min-width: 90px;
+      font-size: 12px;
+    }
+
+    .btn-noshow {
+      border-color: rgba(255,95,109,.4);
+      background: rgba(255,95,109,.12);
+      color: #ff5f6d;
+    }
+
+    .btn-noshow:hover { background: rgba(255,95,109,.22); }
+    .btn-noshow:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-revert {
+      border-color: rgba(124,156,255,.4);
+      background: rgba(124,156,255,.12);
       color: var(--primary2);
     }
 
-    .badge-no {
-      background: rgba(255,255,255,.06);
-      color: var(--muted);
-    }
+    .btn-revert:hover { background: rgba(124,156,255,.22); }
+    .btn-revert:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .loading-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* Consultant form inside dashboard */
-    .form-section {
-      max-width: 700px;
+    .section-divider {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
     }
 
     @media (max-width: 600px) {
@@ -206,9 +211,8 @@
 
 <body>
   <script>
-    // Auth guard
-    const session = JSON.parse(sessionStorage.getItem('wc_consultant_session') || 'null');
-    if (!session || !session.name) {
+    const _session = JSON.parse(sessionStorage.getItem('wc_consultant_session') || 'null');
+    if (!_session || !_session.name) {
       window.location.replace('./login.html');
     }
   </script>
@@ -258,9 +262,10 @@
     <div class="tabs">
       <button class="tab-btn active" data-tab="history">My Consultations</button>
       <button class="tab-btn" data-tab="form">Submit Session</button>
+      <button class="tab-btn" data-tab="noshow">No Show</button>
     </div>
 
-    <!-- History Tab -->
+    <!-- Tab: My Consultations -->
     <div class="tab-panel active" id="tab-history">
       <div class="loading-state" id="history-loading">Loading your consultations...</div>
       <div class="table-wrap" id="history-table-wrap" style="display:none;">
@@ -291,110 +296,179 @@
       </div>
     </div>
 
-    <!-- Form Tab -->
+    <!-- Tab: Submit Session -->
     <div class="tab-panel" id="tab-form">
-      <div class="form-section">
-        <div class="card" id="calendarintro" style="margin-bottom:16px;">
-          <h2>Consultant Session Report</h2>
-          <p>Fill out this form after each consultation session.</p>
+      <div class="card" id="calendarintro" style="margin-bottom:16px;">
+        <h2>Consultant Session Report</h2>
+        <p>Fill out this form after each consultation session. This helps us track appointments and improve our services.</p>
+        <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+      </div>
+
+      <form id="consultant-form" class="card">
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select name="consultId" id="consult-id-select" required>
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Consultant's Name <strong>*</strong></span>
+          <select name="consultantName" id="consultant-name-select" required>
+            <option value="" selected disabled>Loading consultants...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Due date for this writing assignment <strong>*</strong></span>
+          <input type="date" name="dueDate" required />
+        </label>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Writer confidence BEFORE <strong>*</strong></span>
+            <select name="beforeConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Writer confidence AFTER <strong>*</strong></span>
+            <select name="afterConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
         </div>
 
-        <form id="consultant-form" class="card">
+        <div class="grid-2" style="align-items:start;">
+          <div class="field">
+            <span>Consultation Duration <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <span>Dual Enrollment Student? <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>What aspects of writing did you work on today? (Shared with the student) <strong>*</strong></span>
+          <textarea name="workedOn" rows="4" required></textarea>
+        </label>
+
+        <label class="field">
+          <span>Next steps for the writer (Shared with the student) <strong>*</strong></span>
+          <textarea name="nextSteps" rows="4" required></textarea>
+        </label>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Submit Session</button>
+          <button class="btn ghost" type="reset">Reset</button>
+        </div>
+
+        <div class="toast" id="consultant-message"></div>
+      </form>
+    </div>
+
+    <!-- Tab: No Show -->
+    <div class="tab-panel" id="tab-noshow">
+
+      <!-- Mark No-Show -->
+      <div class="card">
+        <div class="panel-head">
+          <h2>Mark No-Show</h2>
+          <p>Select a student who did not show up for their appointment. This will remove them from the sign-up list.</p>
+        </div>
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select id="noshow-id-select">
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <div id="noshow-preview" class="noshow-preview" style="display:none;">
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Student</span>
+            <span id="preview-student"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Appointment</span>
+            <span id="preview-appt"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Course</span>
+            <span id="preview-course"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Teacher</span>
+            <span id="preview-teacher"></span>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:16px;">
+          <button class="btn btn-noshow" id="noshow-btn" disabled>Mark as No-Show</button>
+        </div>
+
+        <div class="toast" id="noshow-message"></div>
+
+        <!-- Revert No-Show -->
+        <div class="section-divider">
+          <div class="panel-head">
+            <h2>Revert a No-Show</h2>
+            <p>If you accidentally marked a student as a no-show, select them below to restore their sign-up.</p>
+          </div>
 
           <label class="field">
-            <span>Select Student Sign-Up <strong>*</strong></span>
-            <select name="consultId" id="consult-id-select" required>
-              <option value="" selected disabled>Loading sign-ups...</option>
+            <span>Select No-Show to Revert</span>
+            <select id="revert-id-select">
+              <option value="" selected disabled>Loading no-shows...</option>
             </select>
           </label>
 
-          <label class="field">
-            <span>Consultant's Name <strong>*</strong></span>
-            <select name="consultantName" id="consultant-name-select" required>
-              <option value="" selected disabled>Loading...</option>
-            </select>
-          </label>
-
-          <label class="field">
-            <span>DUE DATE for this writing assignment <strong>*</strong></span>
-            <input type="date" name="dueDate" required />
-          </label>
-
-          <div class="grid-2" style="align-items: start;">
-            <div class="field">
-              <span>Writer confidence BEFORE <strong>*</strong></span>
-              <select name="beforeConfidence" required>
-                <option value="" selected disabled>Choose</option>
-                <option>Unsure</option>
-                <option>Somewhat Confident</option>
-                <option>Confident</option>
-                <option>Very Confident</option>
-              </select>
-            </div>
-            <div class="field">
-              <span>Writer confidence AFTER <strong>*</strong></span>
-              <select name="afterConfidence" required>
-                <option value="" selected disabled>Choose</option>
-                <option>Unsure</option>
-                <option>Somewhat Confident</option>
-                <option>Confident</option>
-                <option>Very Confident</option>
-              </select>
-            </div>
+          <div class="actions" style="margin-top:16px;">
+            <button class="btn btn-revert" id="revert-btn" disabled>Revert to Scheduled</button>
           </div>
 
-          <div class="grid-2" style="align-items: start;">
-            <div class="field">
-              <span>Consultation Duration <strong>*</strong></span>
-              <div class="radio-row">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
-                </label>
-              </div>
-            </div>
-            <div class="field">
-              <span>Dual Enrollment Student? <strong>*</strong></span>
-              <div class="radio-row">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
-                </label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <label class="field">
-            <span>What aspects of writing did you work on today? <strong>*</strong></span>
-            <textarea name="workedOn" rows="4" required></textarea>
-          </label>
-
-          <label class="field">
-            <span>Next steps for the writer <strong>*</strong></span>
-            <textarea name="nextSteps" rows="4" required></textarea>
-          </label>
-
-          <div class="actions">
-            <button class="btn primary" type="submit">Submit</button>
-            <button class="btn ghost" type="reset">Reset</button>
-          </div>
-
-          <div class="message" id="consultant-message"></div>
-
-        </form>
+          <div class="toast" id="revert-message"></div>
+        </div>
       </div>
+
     </div>
 
   </div>
 
   <footer class="footer">
     <p><strong>Writing Center Location:</strong> Room 212</p>
-    <p><strong>Mrs. Tambellini</strong> — <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a></p>
-    <p><strong>Mrs. Cho</strong> — <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a></p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
   </footer>
 
   <script src="theme-toggle.js"></script>
