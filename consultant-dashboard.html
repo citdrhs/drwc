@@ -2,68 +2,126 @@
 <html>
 
 <head>
-  <title>Writing Center | My Dashboard</title>
+  <title>Writing Center | Consultant Dashboard</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="icon" href="Images/Logo.png">
   <style>
-    .dash-header {
+    .dashboard-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 18px;
+    }
+
+    .dashboard-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 4px;
     }
 
-    .dash-header h2 {
+    .dashboard-header h1 {
       margin: 0;
-      font-size: 20px;
+      padding: 0;
+      font-size: 22px;
       color: var(--primary2);
+      text-align: left;
     }
 
-    .dash-header p {
-      margin: 0;
+    .dashboard-header p {
+      margin: 4px 0 0;
       padding: 0;
       font-size: 13px;
       color: var(--muted);
     }
 
-    .stat-grid {
+    .logout-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      border-color: #ffb4b4;
+      color: #ffb4b4;
+    }
+
+    /* Stats cards */
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 4px;
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
     .stat-card {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 20px 18px;
-      text-align: center;
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
     }
 
     .stat-label {
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      color: var(--muted);
       margin-bottom: 10px;
     }
 
     .stat-value {
-      font-size: 32px;
-      font-weight: 600;
+      font-size: 36px;
+      font-weight: 700;
       color: var(--primary2);
       line-height: 1;
+      margin-bottom: 4px;
     }
 
-    .stat-unit {
-      font-size: 13px;
+    .stat-sub {
+      font-size: 12px;
       color: var(--muted);
-      margin-top: 4px;
     }
 
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      color: var(--muted);
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+
+    .tab-btn.active {
+      color: var(--primary2);
+      border-bottom-color: var(--primary2);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Table */
     .table-wrap {
       overflow-x: auto;
       border-radius: var(--radius);
@@ -74,70 +132,51 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
-      min-width: 900px;
     }
 
-    thead tr {
+    thead {
       background: var(--card);
       border-bottom: 1px solid var(--line);
     }
 
     th {
-      padding: 11px 14px;
+      padding: 12px 14px;
       text-align: left;
       font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      color: var(--muted);
       white-space: nowrap;
     }
 
     td {
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--line);
       color: var(--text);
       vertical-align: top;
-      line-height: 1.5;
     }
 
-    tbody tr:last-child td {
-      border-bottom: none;
-    }
+    tbody tr:last-child td { border-bottom: none; }
 
-    tbody tr:hover {
-      background: var(--card);
-    }
+    tbody tr:hover { background: var(--card); }
 
     .badge {
       display: inline-block;
-      font-size: 11px;
       padding: 2px 8px;
-      border-radius: 999px;
-      font-weight: 500;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
     }
 
     .badge-yes {
-      background: rgba(100, 200, 150, .15);
-      color: #6fcf97;
-      border: 1px solid rgba(100, 200, 150, .3);
+      background: rgba(124,156,255,.18);
+      color: var(--primary2);
     }
 
     .badge-no {
       background: rgba(255,255,255,.06);
       color: var(--muted);
-      border: 1px solid var(--line);
     }
-
-    .conf-arrow {
-      font-size: 12px;
-      color: var(--muted);
-      margin: 0 4px;
-    }
-
-    .conf-up { color: #6fcf97; }
-    .conf-same { color: var(--muted); }
-    .conf-down { color: #ffb4b4; }
 
     .empty-state {
       text-align: center;
@@ -153,56 +192,24 @@
       font-size: 14px;
     }
 
-    .logout-btn {
-      border: 1px solid rgba(255, 100, 100, .45);
-      background: rgba(255, 100, 100, .10);
-      color: #ffb4b4;
-      padding: 8px 16px;
-      border-radius: 999px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      transition: .15s ease;
+    /* Consultant form inside dashboard */
+    .form-section {
+      max-width: 700px;
     }
 
-    .logout-btn:hover {
-      background: rgba(255, 100, 100, .20);
-    }
-
-    body.light-mode .logout-btn {
-      color: #c0392b;
-      border-color: rgba(192,57,43,.45);
-      background: rgba(192,57,43,.08);
-    }
-
-    body.light-mode .logout-btn:hover {
-      background: rgba(192,57,43,.16);
-    }
-
-    body.light-mode .badge-yes {
-      background: rgba(39,174,96,.12);
-      color: #27ae60;
-      border-color: rgba(39,174,96,.3);
-    }
-
-    body.light-mode .conf-up { color: #27ae60; }
-    body.light-mode .conf-down { color: #e74c3c; }
-
-    body.light-mode tbody tr:hover {
-      background: rgba(0,0,0,.03);
-    }
-
-    @media (max-width: 640px) {
-      .stat-grid { grid-template-columns: 1fr; }
-      .dash-header { flex-direction: column; align-items: flex-start; }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-value { font-size: 28px; }
     }
   </style>
 </head>
 
 <body>
   <script>
-    if (!sessionStorage.getItem("wc_dashboard_consultant")) {
-      window.location.replace("./consultant-login.html");
+    // Auth guard
+    const session = JSON.parse(sessionStorage.getItem('wc_consultant_session') || 'null');
+    if (!session || !session.name) {
+      window.location.replace('./login.html');
     }
   </script>
 
@@ -217,80 +224,180 @@
     <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"><img id="drhslogo" src="./Images/drhslogo.png"></a>
   </nav>
 
-  <main class="container">
+  <div class="dashboard-wrapper">
 
     <!-- Header -->
-    <div class="card">
-      <div class="dash-header">
-        <div>
-          <h2 id="dash-greeting">My Dashboard</h2>
-          <p id="dash-subtext">Loading your data...</p>
-        </div>
-        <button class="logout-btn" onclick="logoutConsultant()">Log Out</button>
+    <div class="dashboard-header">
+      <div>
+        <h1>Welcome, <span id="consultant-name"></span></h1>
+        <p>Deep Run Writing Center — Consultant Dashboard</p>
       </div>
+      <a class="logout-btn" href="#" id="logout-btn">Log Out</a>
     </div>
 
-    <!-- Stat Cards -->
-    <div class="stat-grid">
+    <!-- Stats -->
+    <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Total Consultations</div>
         <div class="stat-value" id="stat-consults">—</div>
+        <div class="stat-sub">sessions completed</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Total Hours</div>
         <div class="stat-value" id="stat-hours">—</div>
-        <div class="stat-unit">hrs</div>
+        <div class="stat-sub">hours of consultation</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Total Minutes</div>
         <div class="stat-value" id="stat-minutes">—</div>
-        <div class="stat-unit">min</div>
+        <div class="stat-sub">minutes of consultation</div>
       </div>
     </div>
 
-    <!-- Consultation History Table -->
-    <div class="panel-head">
-      <h2>Consultation History</h2>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="history">My Consultations</button>
+      <button class="tab-btn" data-tab="form">Submit Session</button>
     </div>
 
-    <div class="table-wrap card" style="padding: 0;">
-      <div class="loading-state" id="table-loading">Loading consultations...</div>
-      <table id="dash-table" style="display:none;">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Student</th>
-            <th>Grade</th>
-            <th>Teacher</th>
-            <th>Course</th>
-            <th>Assignment</th>
-            <th>Duration</th>
-            <th>Confidence</th>
-            <th>Dual Enroll</th>
-            <th>Notes</th>
-            <th>Next Steps</th>
-          </tr>
-        </thead>
-        <tbody id="dash-tbody"></tbody>
-      </table>
-      <div class="empty-state" id="table-empty" style="display:none;">No consultations found.</div>
+    <!-- History Tab -->
+    <div class="tab-panel active" id="tab-history">
+      <div class="loading-state" id="history-loading">Loading your consultations...</div>
+      <div class="table-wrap" id="history-table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Student</th>
+              <th>Grade</th>
+              <th>Appointment</th>
+              <th>Teacher</th>
+              <th>Course</th>
+              <th>Assignment</th>
+              <th>Before</th>
+              <th>After</th>
+              <th>Duration</th>
+              <th>Due Date</th>
+              <th>Dual Enroll</th>
+              <th>Notes</th>
+              <th>Next Steps</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="history-empty" style="display:none;">
+        No consultations submitted yet.
+      </div>
     </div>
 
-  </main>
+    <!-- Form Tab -->
+    <div class="tab-panel" id="tab-form">
+      <div class="form-section">
+        <div class="card" id="calendarintro" style="margin-bottom:16px;">
+          <h2>Consultant Session Report</h2>
+          <p>Fill out this form after each consultation session.</p>
+        </div>
+
+        <form id="consultant-form" class="card">
+
+          <label class="field">
+            <span>Select Student Sign-Up <strong>*</strong></span>
+            <select name="consultId" id="consult-id-select" required>
+              <option value="" selected disabled>Loading sign-ups...</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Consultant's Name <strong>*</strong></span>
+            <select name="consultantName" id="consultant-name-select" required>
+              <option value="" selected disabled>Loading...</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>DUE DATE for this writing assignment <strong>*</strong></span>
+            <input type="date" name="dueDate" required />
+          </label>
+
+          <div class="grid-2" style="align-items: start;">
+            <div class="field">
+              <span>Writer confidence BEFORE <strong>*</strong></span>
+              <select name="beforeConfidence" required>
+                <option value="" selected disabled>Choose</option>
+                <option>Unsure</option>
+                <option>Somewhat Confident</option>
+                <option>Confident</option>
+                <option>Very Confident</option>
+              </select>
+            </div>
+            <div class="field">
+              <span>Writer confidence AFTER <strong>*</strong></span>
+              <select name="afterConfidence" required>
+                <option value="" selected disabled>Choose</option>
+                <option>Unsure</option>
+                <option>Somewhat Confident</option>
+                <option>Confident</option>
+                <option>Very Confident</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2" style="align-items: start;">
+            <div class="field">
+              <span>Consultation Duration <strong>*</strong></span>
+              <div class="radio-row">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
+                </label>
+              </div>
+            </div>
+            <div class="field">
+              <span>Dual Enrollment Student? <strong>*</strong></span>
+              <div class="radio-row">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>What aspects of writing did you work on today? <strong>*</strong></span>
+            <textarea name="workedOn" rows="4" required></textarea>
+          </label>
+
+          <label class="field">
+            <span>Next steps for the writer <strong>*</strong></span>
+            <textarea name="nextSteps" rows="4" required></textarea>
+          </label>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Submit</button>
+            <button class="btn ghost" type="reset">Reset</button>
+          </div>
+
+          <div class="message" id="consultant-message"></div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
 
   <footer class="footer">
     <p><strong>Writing Center Location:</strong> Room 212</p>
-    <p><strong>Sponsor Contacts</strong></p>
-    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
-      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
-    </p>
-    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
-      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
-    </p>
+    <p><strong>Mrs. Tambellini</strong> — <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a></p>
+    <p><strong>Mrs. Cho</strong> — <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a></p>
   </footer>
 
   <script src="theme-toggle.js"></script>
   <script src="script.js"></script>
 </body>
-
 </html>

@@ -32,13 +32,30 @@ async function apiPost(action, payload) {
   return res.json();
 }
 
+// ── Tab switching (consultant-form.html) ──────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-panel").forEach(function (p) {
+    p.classList.remove("active");
+  });
+  document.querySelectorAll(".cf-tab-btn").forEach(function (b) {
+    b.classList.remove("active");
+    b.setAttribute("aria-selected", "false");
+  });
+
+  var panel = document.getElementById("tab-" + tab);
+  var btn   = document.getElementById("btn-" + tab);
+  if (panel) panel.classList.add("active");
+  if (btn)   { btn.classList.add("active"); btn.setAttribute("aria-selected", "true"); }
+}
+
 // ── Signup form (signups.html) ────────────────────────────────────────────────
 
 function renderTeacherOptions(teachers) {
-  const select      = document.getElementById("signup-teacher-email");
+  const select       = document.getElementById("signup-teacher-email");
   const manualFields = document.getElementById("manual-teacher-fields");
-  const nameInput   = document.getElementById("manual-teacher-name");
-  const emailInput  = document.getElementById("manual-teacher-email");
+  const nameInput    = document.getElementById("manual-teacher-name");
+  const emailInput   = document.getElementById("manual-teacher-email");
   if (!select) return;
 
   select.innerHTML = "";
@@ -57,13 +74,11 @@ function renderTeacherOptions(teachers) {
     select.appendChild(option);
   });
 
-  // Add "not listed" option at the bottom
   const notListed = document.createElement("option");
   notListed.value = "not_listed";
   notListed.textContent = "My teacher isn't listed...";
   select.appendChild(notListed);
 
-  // Show/hide manual fields based on selection
   select.addEventListener("change", function () {
     if (select.value === "not_listed") {
       manualFields.style.display = "block";
@@ -143,17 +158,14 @@ function bindSignupForm() {
       if (res.ok) {
         showMessage("signup-message", "Sign-up submitted! Confirmation ID: " + res.consult_id, false);
 
-        // Reset form
         form.reset();
         manualFields.style.display = "none";
         nameInput.required  = false;
         emailInput.required = false;
 
-        // Reset teacher dropdown back to placeholder
         const teacherSelect = document.getElementById("signup-teacher-email");
         if (teacherSelect) teacherSelect.selectedIndex = 0;
 
-        // Reload appointments so spot count updates
         await loadAppointments();
       } else {
         showMessage("signup-message", res.error || "Submission failed.", true);
@@ -166,38 +178,43 @@ function bindSignupForm() {
 
 // ── Consultant form (consultant-form.html) ────────────────────────────────────
 
+var _signupOptionsCache = [];
+
 async function loadSignupOptions() {
   const select = document.getElementById("consult-id-select");
-  if (!select) return;
 
   try {
     const data = await apiGet("signupOptions");
-    const options = data.options || [];
+    _signupOptionsCache = data.options || [];
 
-    select.innerHTML = "";
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = options.length ? "Choose a sign-up" : "No open sign-ups";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    select.appendChild(placeholder);
+    if (select) {
+      select.innerHTML = "";
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = _signupOptionsCache.length ? "Choose a sign-up" : "No open sign-ups";
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      select.appendChild(placeholder);
 
-    options.forEach(function (opt) {
-      const option = document.createElement("option");
-      option.value = opt.consult_id;
-      option.textContent = opt.label;
-      select.appendChild(option);
-    });
+      _signupOptionsCache.forEach(function (opt) {
+        const option = document.createElement("option");
+        option.value = opt.consult_id;
+        option.textContent = opt.label;
+        select.appendChild(option);
+      });
+    }
+
+    populateNoShowDropdown(_signupOptionsCache);
+
   } catch (err) {
-    const sel = document.getElementById("consult-id-select");
-    if (sel) {
-      sel.innerHTML = "";
+    if (select) {
+      select.innerHTML = "";
       const opt = document.createElement("option");
       opt.value = "";
       opt.textContent = "Could not load sign-ups";
       opt.disabled = true;
       opt.selected = true;
-      sel.appendChild(opt);
+      select.appendChild(opt);
     }
   }
 }
@@ -217,7 +234,7 @@ function bindConsultationForm() {
         consultant:  fd.get("consultantName"),
         before_conf: fd.get("beforeConfidence"),
         after_conf:  fd.get("afterConfidence"),
-        duration: Number(fd.get("duration")) || 0,
+        duration:    Number(fd.get("duration")) || 0,
         dual_enroll: fd.get("dualEnroll") === "true",
         due_date:    fd.get("dueDate"),
         notes:       fd.get("workedOn"),
@@ -228,7 +245,7 @@ function bindConsultationForm() {
       if (res.ok) {
         showMessage("consultant-message", "Submitted! Consultation ID: " + res.consult_id, false);
         form.reset();
-        await loadSignupOptions();
+        await Promise.all([loadSignupOptions(), loadNoShowOptions()]);
       } else {
         showMessage("consultant-message", res.error || "Submission failed.", true);
       }
@@ -237,6 +254,156 @@ function bindConsultationForm() {
     }
   });
 }
+
+// ── No-show tab ───────────────────────────────────────────────────────────────
+
+function populateNoShowDropdown(options) {
+  const select = document.getElementById("noshow-id-select");
+  const btn    = document.getElementById("noshow-btn");
+  if (!select) return;
+
+  select.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = options.length ? "Choose a student" : "No open sign-ups";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  select.appendChild(placeholder);
+
+  options.forEach(function (opt) {
+    const option = document.createElement("option");
+    option.value = opt.consult_id;
+    option.dataset.student = opt.student_name  || "";
+    option.dataset.appt    = opt.date          || "";
+    option.dataset.course  = opt.course        || "";
+    option.dataset.teacher = opt.teacher_email || "";
+    option.textContent = opt.label;
+    select.appendChild(option);
+  });
+
+  select.addEventListener("change", function () {
+    const selected = select.options[select.selectedIndex];
+    if (!selected || !selected.value) {
+      document.getElementById("noshow-preview").style.display = "none";
+      if (btn) btn.disabled = true;
+      return;
+    }
+
+    document.getElementById("preview-student").textContent = selected.dataset.student  || "—";
+    document.getElementById("preview-appt").textContent    = selected.dataset.appt     || "—";
+    document.getElementById("preview-course").textContent  = selected.dataset.course   || "—";
+    document.getElementById("preview-teacher").textContent = selected.dataset.teacher  || "—";
+    document.getElementById("noshow-preview").style.display = "grid";
+    if (btn) btn.disabled = false;
+  });
+}
+
+async function submitNoShow() {
+  const select = document.getElementById("noshow-id-select");
+  const btn    = document.getElementById("noshow-btn");
+  if (!select || !select.value) return;
+
+  const consultId   = select.value;
+  const studentName = select.options[select.selectedIndex].dataset.student || "this student";
+
+  const confirmed = window.confirm("Mark " + studentName + " as a no-show? This cannot be undone.");
+  if (!confirmed) return;
+
+  btn.disabled = true;
+  showMessage("noshow-message", "Marking as no-show...", false);
+
+  try {
+    const res = await apiPost("markNoShow", { consult_id: consultId });
+
+    if (res.ok) {
+      showMessage("noshow-message", studentName + " has been marked as a no-show.", false);
+      document.getElementById("noshow-preview").style.display = "none";
+      await Promise.all([loadSignupOptions(), loadNoShowOptions()]);
+    } else {
+      showMessage("noshow-message", res.error || "Could not mark no-show.", true);
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showMessage("noshow-message", err.message, true);
+    btn.disabled = false;
+  }
+}
+
+// ── Revert No-Show ────────────────────────────────────────────────────────────
+
+async function loadNoShowOptions() {
+  const select = document.getElementById("revert-id-select");
+  const btn    = document.getElementById("revert-btn");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("noShowOptions");
+    const options = data.options || [];
+
+    select.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = options.length ? "Choose a student" : "No no-shows found";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    options.forEach(function (opt) {
+      const option = document.createElement("option");
+      option.value = opt.consult_id;
+      option.textContent = opt.label;
+      select.appendChild(option);
+    });
+
+    if (btn) btn.disabled = true;
+
+    select.addEventListener("change", function () {
+      if (btn) btn.disabled = !select.value;
+    });
+
+  } catch (err) {
+    select.innerHTML = "";
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Could not load no-shows";
+    opt.disabled = true;
+    opt.selected = true;
+    select.appendChild(opt);
+  }
+}
+
+async function submitRevert() {
+  const select = document.getElementById("revert-id-select");
+  const btn    = document.getElementById("revert-btn");
+  if (!select || !select.value) return;
+
+  const consultId   = select.value;
+  const studentName = select.options[select.selectedIndex].text;
+
+  const confirmed = window.confirm("Revert " + studentName + " back to scheduled?");
+  if (!confirmed) return;
+
+  btn.disabled = true;
+  showMessage("revert-message", "Reverting...", false);
+
+  try {
+    const res = await apiPost("revertNoShow", { consult_id: consultId });
+
+    if (res.ok) {
+      showMessage("revert-message", studentName + " has been restored to scheduled.", false);
+      await Promise.all([loadSignupOptions(), loadNoShowOptions()]);
+    } else {
+      showMessage("revert-message", res.error || "Could not revert.", true);
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showMessage("revert-message", err.message, true);
+    btn.disabled = false;
+  }
+}
+
+// ── Appointments dropdown (signups.html) ──────────────────────────────────────
 
 async function loadAppointments() {
   const select = document.getElementById("appointment-select");
@@ -283,97 +450,8 @@ async function loadAppointments() {
   }
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── Consultants dropdown ──────────────────────────────────────────────────────
 
-document.addEventListener("DOMContentLoaded", async function () {
-  if (document.getElementById("signup-form")) {
-    bindSignupForm();
-    await Promise.all([loadTeachers(), loadAppointments()]);
-  }
-
-  if (document.getElementById("consultant-form")) {
-    bindConsultationForm();
-    await Promise.all([loadSignupOptions(), loadConsultants()]);
-  }
-});
-
-// ── Login page (login.html) ───────────────────────────────────────────────────
-
-document.addEventListener("DOMContentLoaded", function () {
-  const pwInput  = document.getElementById("login-password");
-  const loginBtn = document.getElementById("login-btn");
-  const msgEl    = document.getElementById("login-message");
-  const pwToggle = document.getElementById("pw-toggle");
-
-  if (!pwInput || !loginBtn || !msgEl || !pwToggle) return; // not on login page
-
-  const SESSION_KEY = "wc_consultant_auth";
-
-  pwToggle.addEventListener("click", function () {
-    const hidden = pwInput.type === "password";
-    pwInput.type = hidden ? "text" : "password";
-    pwToggle.textContent = hidden ? "Hide" : "Show";
-  });
-
-  pwInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") handleLogin();
-  });
-
-  loginBtn.addEventListener("click", handleLogin);
-
-  async function handleLogin() {
-    const password = pwInput.value.trim();
-    if (!password) {
-      showMsg("Please enter your access code.", "error");
-      return;
-    }
-
-    setLoading(true);
-    showMsg("Checking...", "info");
-
-    try {
-      const url = new URL(API_URL);
-      url.searchParams.set("action", "checkPassword");
-      url.searchParams.set("password", password);
-
-      const res = await fetch(url.toString(), {
-        method: "GET",
-        headers: { Accept: "application/json" }
-      });
-
-      if (!res.ok) throw new Error("Network error");
-      const data = await res.json();
-
-      if (data.ok) {
-        sessionStorage.setItem(SESSION_KEY, "true");
-        showMsg("Access granted! Redirecting...", "info");
-        setTimeout(function () {
-          window.location.href = "./consultant-form.html";
-        }, 800);
-      } else {
-        showMsg("Incorrect access code. Please try again.", "error");
-        pwInput.value = "";
-        pwInput.focus();
-      }
-    } catch (err) {
-      showMsg("Could not reach the server. Check your connection.", "error");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function showMsg(text, type) {
-    msgEl.textContent = text;
-    msgEl.className = "login-message " + type;
-  }
-
-  function setLoading(state) {
-    loginBtn.disabled = state;
-    loginBtn.textContent = state ? "Checking..." : "Enter";
-  }
-});
-
-//loading consultants 
 async function loadConsultants() {
   const select = document.getElementById("consultant-name-select");
   if (!select) return;
@@ -416,5 +494,232 @@ async function loadConsultants() {
     opt.disabled = true;
     opt.selected = true;
     select.appendChild(opt);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", async function () {
+  if (document.getElementById("signup-form")) {
+    bindSignupForm();
+    await Promise.all([loadTeachers(), loadAppointments()]);
+  }
+
+  if (document.getElementById("consultant-form")) {
+    bindConsultationForm();
+    await Promise.all([loadSignupOptions(), loadConsultants(), loadNoShowOptions()]);
+  }
+});
+
+// ── Login page (login.html) ───────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", function () {
+  const usernameInput = document.getElementById("login-username");
+  const pwInput       = document.getElementById("login-password");
+  const loginBtn      = document.getElementById("login-btn");
+  const msgEl         = document.getElementById("login-message");
+  const pwToggle      = document.getElementById("pw-toggle");
+
+  if (!pwInput || !loginBtn || !msgEl || !pwToggle) return;
+
+  pwToggle.addEventListener("click", function () {
+    const hidden = pwInput.type === "password";
+    pwInput.type = hidden ? "text" : "password";
+    pwToggle.textContent = hidden ? "Hide" : "Show";
+  });
+
+  [usernameInput, pwInput].forEach(function(el) {
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") handleLogin();
+    });
+  });
+
+  loginBtn.addEventListener("click", handleLogin);
+
+  async function handleLogin() {
+    const username = (usernameInput.value || "").trim();
+    const password = (pwInput.value || "").trim();
+
+    if (!username || !password) {
+      showMsg("Please enter your username and password.", "error");
+      return;
+    }
+
+    setLoading(true);
+    showMsg("Checking...", "info");
+
+    try {
+      const url = new URL(API_URL);
+      url.searchParams.set("action", "checkPassword");
+      url.searchParams.set("username", username);
+      url.searchParams.set("password", password);
+
+      const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" }
+      });
+
+      if (!res.ok) throw new Error("Network error");
+      const data = await res.json();
+
+      if (data.ok) {
+        // Store full session with consultant name
+        sessionStorage.setItem("wc_consultant_session", JSON.stringify({
+          name: data.name,
+          username: username
+        }));
+        showMsg("Access granted! Redirecting...", "info");
+        setTimeout(function () {
+          window.location.href = "./consultant-dashboard.html";
+        }, 800);
+      } else {
+        showMsg("Incorrect username or password.", "error");
+        pwInput.value = "";
+        pwInput.focus();
+      }
+    } catch (err) {
+      showMsg("Could not reach the server. Check your connection.", "error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = "login-message " + type;
+  }
+
+  function setLoading(state) {
+    loginBtn.disabled = state;
+    loginBtn.textContent = state ? "Checking..." : "Enter";
+  }
+});
+
+// ── Dashboard page (dashboard.html) ──────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", async function () {
+  if (!document.getElementById("consultant-name")) return;
+
+  const session = JSON.parse(sessionStorage.getItem("wc_consultant_session") || "null");
+  if (!session) return;
+
+  // Set name
+  document.getElementById("consultant-name").textContent = session.name;
+
+  // Logout
+  document.getElementById("logout-btn").addEventListener("click", function (e) {
+    e.preventDefault();
+    sessionStorage.removeItem("wc_consultant_session");
+    window.location.href = "./login.html";
+  });
+
+  // Tabs
+  document.querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); });
+      document.querySelectorAll(".tab-panel").forEach(function(p) { p.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  // Load everything in parallel
+  await Promise.all([
+    loadStats(session.name),
+    loadHistory(session.name),
+    loadSignupOptions(),
+    loadConsultants(session.name)
+  ]);
+
+  // Bind form
+  bindConsultationForm();
+});
+
+async function loadStats(name) {
+  try {
+    const data = await apiGet("getConsultantStats", { name: name });
+    document.getElementById("stat-consults").textContent = data.total_consults || 0;
+    document.getElementById("stat-hours").textContent    = data.total_hours    || 0;
+    document.getElementById("stat-minutes").textContent  = data.total_minutes  || 0;
+  } catch (err) {
+    console.error("Could not load stats", err);
+  }
+}
+
+async function loadHistory(name) {
+  const loading   = document.getElementById("history-loading");
+  const tableWrap = document.getElementById("history-table-wrap");
+  const empty     = document.getElementById("history-empty");
+  const tbody     = document.getElementById("history-tbody");
+
+  try {
+    const data = await apiGet("getConsultantHistory", { name: name });
+    const rows = data.rows || [];
+
+    loading.style.display = "none";
+
+    if (rows.length === 0) {
+      empty.style.display = "block";
+      return;
+    }
+
+    tbody.innerHTML = "";
+    rows.forEach(function (row) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = [
+        '<td>' + (row.completed_at ? row.completed_at.slice(0, 10) : '—') + '</td>',
+        '<td>' + (row.student_name  || '—') + '<br><small style="color:var(--muted)">' + (row.student_email || '') + '</small></td>',
+        '<td>' + (row.student_grade || '—') + '</td>',
+        '<td>' + (row.appointment   || '—') + '</td>',
+        '<td>' + (row.teacher_email || '—') + '</td>',
+        '<td>' + (row.course        || '—') + '</td>',
+        '<td>' + (row.assignment_type || '—') + '</td>',
+        '<td>' + (row.before_conf   || '—') + '</td>',
+        '<td>' + (row.after_conf    || '—') + '</td>',
+        '<td>' + (row.duration      || '—') + ' min</td>',
+        '<td>' + (row.due_date      || '—') + '</td>',
+        '<td><span class="badge ' + (row.dual_enroll ? 'badge-yes' : 'badge-no') + '">' + (row.dual_enroll ? 'Yes' : 'No') + '</span></td>',
+        '<td style="max-width:200px;white-space:pre-wrap">' + (row.notes      || '—') + '</td>',
+        '<td style="max-width:200px;white-space:pre-wrap">' + (row.next_steps || '—') + '</td>'
+      ].join('');
+      tbody.appendChild(tr);
+    });
+
+    tableWrap.style.display = "block";
+  } catch (err) {
+    loading.textContent = "Could not load consultation history.";
+    console.error(err);
+  }
+}
+
+async function loadConsultants(preselect) {
+  const select = document.getElementById("consultant-name-select");
+  if (!select) return;
+
+  try {
+    const data = await apiGet("getConsultants");
+    const consultants = data.consultants || [];
+
+    select.innerHTML = "";
+
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select your name";
+    placeholder.disabled = true;
+    select.appendChild(placeholder);
+
+    consultants.forEach(function (name) {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      if (preselect && name === preselect) option.selected = true;
+      select.appendChild(option);
+    });
+
+    // If preselected name not found, show placeholder
+    if (!select.value) select.selectedIndex = 0;
+
+  } catch (err) {
+    select.innerHTML = "<option disabled selected>Could not load</option>";
   }
 }
