@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbz6eduq4w8NGB4ccOuqvq9FMqXbcMrW2jbDxap3cnAFvjj0CjzD2df2zw5OOIyzMGgznw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxStroGpakfRoXG4ziS0ttQrEqW6MwsjadRrIXaTVIMJfEt7IrQH6enP6NvlmAk1VP5Zw/exec";
 
 function showMessage(id, message, isError) {
   const el = document.getElementById(id);
@@ -630,7 +630,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     loadSignupOptions(),
     loadConsultants(session.name),
     loadNoShowOptions(),
-    loadRevertOptions()
+    loadRevertOptions(),
+    loadHoursLog(session.name)
   ]);
 
   // Bind form
@@ -640,14 +641,29 @@ document.addEventListener("DOMContentLoaded", async function () {
   const revertBtn = document.getElementById("revert-btn");
   if (noshowBtn) noshowBtn.addEventListener("click", submitNoShow);
   if (revertBtn) revertBtn.addEventListener("click", submitRevert);
+  bindHoursLogForm(session.name);
 });
 
 async function loadStats(name) {
   try {
-    const data = await apiGet("getConsultantStats", { name: name });
-    document.getElementById("stat-consults").textContent = data.total_consults || 0;
-    document.getElementById("stat-hours").textContent    = data.total_hours    || 0;
-    document.getElementById("stat-minutes").textContent  = data.total_minutes  || 0;
+    const [statsData, hoursData] = await Promise.all([
+      apiGet("getConsultantStats", { name: name }),
+      apiGet("getHoursLog", { name: name })
+    ]);
+
+    const consultHours = Number(statsData.total_hours   || 0);
+    const consultMins  = Number(statsData.total_minutes || 0);
+
+    // Sum up manually logged hours
+    const loggedHours = (hoursData.rows || []).reduce(function(sum, row) {
+      return sum + (Number(row.hours) || 0);
+    }, 0);
+
+    const totalHours = Math.round((consultHours + loggedHours) * 100) / 100;
+
+    document.getElementById("stat-consults").textContent = statsData.total_consults || 0;
+    document.getElementById("stat-hours").textContent    = totalHours;
+    document.getElementById("stat-minutes").textContent  = consultMins;
   } catch (err) {
     console.error("Could not load stats", err);
   }
@@ -864,4 +880,97 @@ async function submitRevert() {
     btn.disabled = false;
     btn.textContent = "Revert to Scheduled";
   }
+}
+
+// ── Hours Log (consultant-dashboard.html) ─────────────────────────────────────
+
+async function loadHoursLog(name) {
+  const loading   = document.getElementById("hours-loading");
+  const tableWrap = document.getElementById("hours-table-wrap");
+  const empty     = document.getElementById("hours-empty");
+  const tbody     = document.getElementById("hours-tbody");
+  if (!loading) return;
+
+  try {
+    const data = await apiGet("getHoursLog", { name: name });
+    const rows = data.rows || [];
+
+    loading.style.display = "none";
+
+    if (rows.length === 0) {
+      empty.style.display = "block";
+      return;
+    }
+
+    tbody.innerHTML = "";
+    rows.forEach(function (row) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = [
+        '<td>' + (row.date        || '—') + '</td>',
+        '<td>' + (row.hours       || '—') + ' hrs</td>',
+        '<td>' + (row.description || '—') + '</td>',
+        '<td>' + (row.submitted_at ? row.submitted_at.slice(0, 10) : '—') + '</td>'
+      ].join('');
+      tbody.appendChild(tr);
+    });
+
+    tableWrap.style.display = "block";
+
+  } catch (err) {
+    loading.textContent = "Could not load hours log.";
+    console.error(err);
+  }
+}
+
+function bindHoursLogForm(name) {
+  const form = document.getElementById("hours-log-form");
+  if (!form) return;
+
+  const submitBtn = document.getElementById("hours-submit-btn");
+  if (!submitBtn) return;
+
+  submitBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const msgEl = document.getElementById("hours-message");
+    const btn = document.getElementById("hours-submit-btn");
+
+    const date        = document.getElementById("hours-date").value.trim();
+    const hours       = document.getElementById("hours-amount").value.trim();
+    const description = document.getElementById("hours-description").value.trim();
+
+    if (!date || !hours || !description) {
+      msgEl.textContent = "Please fill in all fields.";
+      msgEl.style.color = "#ffb4b4";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+    msgEl.textContent = "";
+
+    try {
+      const res = await apiPost("submitHoursLog", {
+        consultant:  name,
+        date:        date,
+        hours:       Number(hours),
+        description: description
+      });
+
+      if (res.ok) {
+        msgEl.textContent = "Hours logged successfully!";
+        msgEl.style.color = "var(--primary2)";
+        form.reset();
+        await loadHoursLog(name);
+      } else {
+        msgEl.textContent = res.error || "Failed to log hours.";
+        msgEl.style.color = "#ffb4b4";
+      }
+    } catch (err) {
+      msgEl.textContent = err.message;
+      msgEl.style.color = "#ffb4b4";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Log Hours";
+    }
+  });
 }
