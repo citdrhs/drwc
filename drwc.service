@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve drwc
+After=network.target
+
+[Service]
+User=drwc
+Group=www-data
+WorkingDirectory=/home/drwc/www
+Environment=PATH=/home/drwc/www/venv/bin SCRIPT_NAME=/drwc
+ExecStart=/home/drwc/www/venv/bin/gunicorn --workers 3 --bind unix:drwc.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target

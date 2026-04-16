@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxStroGpakfRoXG4ziS0ttQrEqW6MwsjadRrIXaTVIMJfEt7IrQH6enP6NvlmAk1VP5Zw/exec"
 
-@app.route("/", methods=["GET", "POST", "OPTIONS"])
+@app.route("/api", methods=["GET", "POST", "OPTIONS"])
 def proxy_root():
     if request.method == "OPTIONS":
         resp = Response()
@@ -26,4 +26,4 @@ def proxy_root():
     return response
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=5000, host='0.0.0.0', debug=True)
