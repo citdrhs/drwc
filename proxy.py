@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxStroGpakfRoXG4ziS0ttQrEqW6MwsjadRrIXaTVIMJfEt7IrQH6enP6NvlmAk1VP5Zw/exec"
 
-@app.route("/api", methods=["GET", "POST", "OPTIONS"])
+@app.route("/drwc/api", methods=["GET", "POST", "OPTIONS"])
 def proxy_root():
     if request.method == "OPTIONS":
         resp = Response()
