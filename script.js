@@ -25,7 +25,7 @@ async function apiGet(action, params) {
 async function apiPost(action, payload) {
   const res = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: action, payload: payload })
   });
   if (!res.ok) throw new Error("Request failed: " + res.status);
