@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxStroGpakfRoXG4ziS0ttQrEqW6MwsjadRrIXaTVIMJfEt7IrQH6enP6NvlmAk1VP5Zw/exec";
+const API_URL = "https://drhscit.org/drwc/api";
 
 function showMessage(id, message, isError) {
   const el = document.getElementById(id);
