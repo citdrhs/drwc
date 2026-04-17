@@ -2,6 +2,7 @@
 <html>
 
 <head>
+  <meta charset="UTF-8" />
   <title>Writing Center | Consultant Dashboard</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="icon" href="Images/Logo.png">
@@ -156,7 +157,7 @@
       font-size: 14px;
     }
 
-    /* No show preview */
+    /* No show */
     .noshow-preview {
       background: var(--card2);
       border: 1px solid var(--line);
@@ -234,7 +235,7 @@
     <div class="dashboard-header">
       <div>
         <h1>Welcome, <span id="consultant-name"></span></h1>
-        <p>Deep Run Writing Center — Consultant Dashboard</p>
+        <p>Deep Run Writing Center &mdash; Consultant Dashboard</p>
       </div>
       <a class="logout-btn" href="#" id="logout-btn">Log Out</a>
     </div>
@@ -263,6 +264,7 @@
       <button class="tab-btn active" data-tab="history">My Consultations</button>
       <button class="tab-btn" data-tab="form">Submit Session</button>
       <button class="tab-btn" data-tab="noshow">No Show</button>
+      <button class="tab-btn" data-tab="hourslog">Log Hours</button>
     </div>
 
     <!-- Tab: My Consultations -->
@@ -394,8 +396,6 @@
 
     <!-- Tab: No Show -->
     <div class="tab-panel" id="tab-noshow">
-
-      <!-- Mark No-Show -->
       <div class="card">
         <div class="panel-head">
           <h2>Mark No-Show</h2>
@@ -454,6 +454,63 @@
 
           <div class="toast" id="revert-message"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- Tab: Log Hours -->
+    <div class="tab-panel" id="tab-hourslog">
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="panel-head">
+          <h2>Log Hours</h2>
+          <p>Record hours outside of consultation sessions</p>
+        </div>
+
+        <form id="hours-log-form" onsubmit="return false;">
+
+          <div class="grid-2">
+            <label class="field">
+              <span>Date <strong>*</strong></span>
+              <input type="date" id="hours-date" required />
+            </label>
+            <label class="field">
+              <span>Hours <strong>*</strong></span>
+              <input type="number" id="hours-amount" min="0.5" max="12" step="0.5" placeholder="e.g. 1.5" required />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Description <strong>*</strong></span>
+            <input type="text" id="hours-description" placeholder="e.g. Writing Center training session" required />
+          </label>
+
+          <div class="actions">
+            <button class="btn primary" type="button" id="hours-submit-btn">Log Hours</button>
+            <button class="btn ghost" type="reset">Reset</button>
+          </div>
+
+          <div class="toast" id="hours-message"></div>
+
+        </form>
+      </div>
+
+      <!-- Hours history -->
+      <div class="loading-state" id="hours-loading">Loading your hours log...</div>
+      <div class="table-wrap" id="hours-table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Hours</th>
+              <th>Description</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
+          <tbody id="hours-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="hours-empty" style="display:none;">
+        No hours logged yet.
       </div>
 
     </div>
