@@ -646,24 +646,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 async function loadStats(name) {
   try {
-    const [statsData, hoursData] = await Promise.all([
-      apiGet("getConsultantStats", { name: name }),
-      apiGet("getHoursLog", { name: name })
-    ]);
-
-    const consultHours = Number(statsData.total_hours   || 0);
-    const consultMins  = Number(statsData.total_minutes || 0);
-
-    // Sum up manually logged hours
-    const loggedHours = (hoursData.rows || []).reduce(function(sum, row) {
-      return sum + (Number(row.hours) || 0);
-    }, 0);
-
-    const totalHours = Math.round((consultHours + loggedHours) * 100) / 100;
+    const statsData = await apiGet("getConsultantStats", { name: name });
 
     document.getElementById("stat-consults").textContent = statsData.total_consults || 0;
-    document.getElementById("stat-hours").textContent    = totalHours;
-    document.getElementById("stat-minutes").textContent  = consultMins;
+    document.getElementById("stat-hours").textContent    = statsData.total_hours    || 0;
+    document.getElementById("stat-minutes").textContent  = statsData.total_minutes  || 0;
   } catch (err) {
     console.error("Could not load stats", err);
   }
