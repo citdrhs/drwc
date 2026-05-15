@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing Center | Consultant Form</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link href="consultant-form.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="Images/Logo.png">
+</head>
+
+<body id="consultantform">
+<script>
+  const _session = JSON.parse(sessionStorage.getItem("wc_consultant_session") || "null");
+  if (!_session || !_session.name) {
+    window.location.replace("./login.html");
+  }
+</script>
+
+  <nav>
+    <a id="navlogo_link" href="./index.html"> <img alt="Deep Run Writing Center logo" id="navlogo" src="./Images/Logo.png"> </a>
+    <a href="./signups.html"> Sign-Ups </a>
+    <a href="./consultants.html"> Staff </a>
+    <a href="./media.html"> Media </a>
+    <a href="./resources.html"> Resources </a>
+    <a href="./applications.html"> Consultant Applications </a>
+    <a href="./login.html">Consultant Login</a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"> <img alt="Deep Run High School logo" id="drhslogo" src="./Images/drhslogo.png"> </a>
+  </nav>
+
+  <main class="container">
+    <div class="card" id="calendarintro">
+      <h2>Writing Center Consultant Portal</h2>
+      <p>Use the tabs below to submit a session report or manage no-shows.</p>
+      <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+    </div>
+
+    <!-- Tab buttons -->
+    <div class="cf-tabs" role="tablist">
+      <button class="cf-tab-btn active" id="btn-session" role="tab" aria-selected="true" aria-controls="tab-session" onclick="switchTab('session')">
+        Session Report
+      </button>
+      <button class="cf-tab-btn" id="btn-noshow" role="tab" aria-selected="false" aria-controls="tab-noshow" onclick="switchTab('noshow')">
+        Mark No-Show
+      </button>
+    </div>
+
+    <!-- TAB 1: Session Report -->
+    <section id="tab-session" class="tab-panel active" role="tabpanel">
+      <div class="panel-head">
+        <h2>Consultant Session Report</h2>
+        <p>Fill this out after each consultation session.</p>
+      </div>
+
+      <form id="consultant-form" class="card">
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select name="consultId" id="consult-id-select" required>
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Consultant's Name <strong>*</strong></span>
+          <select name="consultantName" id="consultant-name-select" required>
+            <option value="" selected disabled>Loading consultants...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Due date for this writing assignment <strong>*</strong></span>
+          <input type="date" name="dueDate" required />
+        </label>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Writer confidence BEFORE <strong>*</strong></span>
+            <select name="beforeConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Writer confidence AFTER <strong>*</strong></span>
+            <select name="afterConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="grid-2" style="align-items: start;">
+          <div class="field">
+            <span>Consultation Duration <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <span>Dual Enrollment Student? <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>What aspects of writing did you work on today? (Shared with the student) <strong>*</strong></span>
+          <textarea name="workedOn" rows="4" required></textarea>
+        </label>
+
+        <label class="field">
+          <span>Next steps for the writer (Shared with the student) <strong>*</strong></span>
+          <textarea name="nextSteps" rows="4" required></textarea>
+        </label>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Submit Session</button>
+          <button class="btn ghost" type="reset">Reset</button>
+        </div>
+
+        <div class="toast" id="consultant-message"></div>
+      </form>
+    </section>
+
+    <!-- TAB 2: Mark No-Show + Revert -->
+    <section id="tab-noshow" class="tab-panel" role="tabpanel">
+
+      <!-- Mark No-Show -->
+      <div class="panel-head">
+        <h2>Mark No-Show</h2>
+        <p>Select a student who did not show up for their appointment. This will remove them from the sign-up list.</p>
+      </div>
+
+      <div class="card" id="noshow-form">
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select id="noshow-id-select">
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <!-- Preview of selected sign-up details -->
+        <div id="noshow-preview" class="noshow-preview" style="display:none;">
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Student</span>
+            <span id="preview-student"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Appointment</span>
+            <span id="preview-appt"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Course</span>
+            <span id="preview-course"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Teacher</span>
+            <span id="preview-teacher"></span>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top: 16px;">
+          <button class="btn btn-noshow" id="noshow-btn" onclick="submitNoShow()" disabled>
+            Mark as No-Show
+          </button>
+        </div>
+
+        <div class="toast" id="noshow-message"></div>
+
+        <!-- Revert No-Show -->
+        <div style="margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line);">
+          <div class="panel-head">
+            <h2>Revert a No-Show</h2>
+            <p>If you accidentally marked a student as a no-show, select them below to restore their sign-up.</p>
+          </div>
+
+          <label class="field">
+            <span>Select No-Show to Revert</span>
+            <select id="revert-id-select">
+              <option value="" selected disabled>Loading no-shows...</option>
+            </select>
+          </label>
+
+          <div class="actions" style="margin-top: 16px;">
+            <button class="btn btn-revert" id="revert-btn" onclick="submitRevert()" disabled>
+              Revert to Scheduled
+            </button>
+          </div>
+
+          <div class="toast" id="revert-message"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
+  </footer>
+
+  <script src="theme-toggle.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Writing Center | Consultant Dashboard</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="Images/Logo.png">
+  <style>
+    .dashboard-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 18px;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .dashboard-header h1 {
+      margin: 0;
+      padding: 0;
+      font-size: 22px;
+      color: var(--primary2);
+      text-align: left;
+    }
+
+    .dashboard-header p {
+      margin: 4px 0 0;
+      padding: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .logout-btn:hover {
+      border-color: #ffb4b4;
+      color: #ffb4b4;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary2);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-sub { font-size: 12px; color: var(--muted); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      border: none;
+      background: none;
+      color: var(--muted);
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--primary2); border-bottom-color: var(--primary2); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* History table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: var(--card); border-bottom: 1px solid var(--line); }
+
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--card); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .badge-yes { background: rgba(124,156,255,.18); color: var(--primary2); }
+    .badge-no  { background: rgba(255,255,255,.06); color: var(--muted); }
+
+    .empty-state, .loading-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* No show */
+    .noshow-preview {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+
+    .noshow-preview-row {
+      display: flex;
+      gap: 12px;
+      padding: 4px 0;
+      font-size: 13px;
+    }
+
+    .noshow-preview-label {
+      color: var(--muted);
+      min-width: 90px;
+      font-size: 12px;
+    }
+
+    .btn-noshow {
+      border-color: rgba(255,95,109,.4);
+      background: rgba(255,95,109,.12);
+      color: #ff5f6d;
+    }
+
+    .btn-noshow:hover { background: rgba(255,95,109,.22); }
+    .btn-noshow:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-revert {
+      border-color: rgba(124,156,255,.4);
+      background: rgba(124,156,255,.12);
+      color: var(--primary2);
+    }
+
+    .btn-revert:hover { background: rgba(124,156,255,.22); }
+    .btn-revert:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .section-divider {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-value { font-size: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    const _session = JSON.parse(sessionStorage.getItem('wc_consultant_session') || 'null');
+    if (!_session || !_session.name) {
+      window.location.replace('./login.html');
+    }
+  </script>
+
+  <nav>
+    <a id="navlogo_link" href="./index.html"><img alt="Deep Run Writing Center logo" id="navlogo" src="./Images/Logo.png"></a>
+    <a href="./signups.html">Sign-Ups</a>
+    <a href="./consultants.html">Staff</a>
+    <a href="./media.html">Media</a>
+    <a href="./resources.html">Resources</a>
+    <a href="./applications.html">Consultant Applications</a>
+    <a href="./login.html">Consultant Login</a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"><img alt="Deep Run High School logo" id="drhslogo" src="./Images/drhslogo.png"></a>
+  </nav>
+
+  <div class="dashboard-wrapper">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1>Welcome, <span id="consultant-name"></span></h1>
+        <p>Deep Run Writing Center &mdash; Consultant Dashboard</p>
+      </div>
+      <a class="logout-btn" href="#" id="logout-btn">Log Out</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Consultations</div>
+        <div class="stat-value" id="stat-consults">—</div>
+        <div class="stat-sub">sessions completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Hours</div>
+        <div class="stat-value" id="stat-hours">—</div>
+        <div class="stat-sub">hours of consultation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Minutes</div>
+        <div class="stat-value" id="stat-minutes">—</div>
+        <div class="stat-sub">minutes of consultation</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="history">My Consultations</button>
+      <button class="tab-btn" data-tab="form">Submit Session</button>
+      <button class="tab-btn" data-tab="noshow">No Show</button>
+      <button class="tab-btn" data-tab="hourslog">Log Hours</button>
+    </div>
+
+    <!-- Tab: My Consultations -->
+    <div class="tab-panel active" id="tab-history">
+      <div class="loading-state" id="history-loading">Loading your consultations...</div>
+      <div class="table-wrap" id="history-table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Student</th>
+              <th>Grade</th>
+              <th>Appointment</th>
+              <th>Teacher</th>
+              <th>Course</th>
+              <th>Assignment</th>
+              <th>Before</th>
+              <th>After</th>
+              <th>Duration</th>
+              <th>Due Date</th>
+              <th>Dual Enroll</th>
+              <th>Notes</th>
+              <th>Next Steps</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="history-empty" style="display:none;">
+        No consultations submitted yet.
+      </div>
+    </div>
+
+    <!-- Tab: Submit Session -->
+    <div class="tab-panel" id="tab-form">
+      <div class="card" id="calendarintro" style="margin-bottom:16px;">
+        <h2>Consultant Session Report</h2>
+        <p>Fill out this form after each consultation session. This helps us track appointments and improve our services.</p>
+        <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+      </div>
+
+      <form id="consultant-form" class="card">
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select name="consultId" id="consult-id-select" required>
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Consultant's Name <strong>*</strong></span>
+          <select name="consultantName" id="consultant-name-select" required>
+            <option value="" selected disabled>Loading consultants...</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Due date for this writing assignment <strong>*</strong></span>
+          <input type="date" name="dueDate" required />
+        </label>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Writer confidence BEFORE <strong>*</strong></span>
+            <select name="beforeConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Writer confidence AFTER <strong>*</strong></span>
+            <select name="afterConfidence" required>
+              <option value="" selected disabled>Choose</option>
+              <option>Unsure</option>
+              <option>Somewhat Confident</option>
+              <option>Confident</option>
+              <option>Very Confident</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="grid-2" style="align-items:start;">
+          <div class="field">
+            <span>Consultation Duration <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="duration" value="30" required style="width:auto;" /> 30 min
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="duration" value="60" required style="width:auto;" /> 60 min
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <span>Dual Enrollment Student? <strong>*</strong></span>
+            <div class="radio-row">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="true" required style="width:auto;" /> Yes
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="radio" name="dualEnroll" value="false" required style="width:auto;" /> No
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>What aspects of writing did you work on today? (Shared with the student) <strong>*</strong></span>
+          <textarea name="workedOn" rows="4" required></textarea>
+        </label>
+
+        <label class="field">
+          <span>Next steps for the writer (Shared with the student) <strong>*</strong></span>
+          <textarea name="nextSteps" rows="4" required></textarea>
+        </label>
+
+        <div class="actions">
+          <button class="btn primary" type="submit">Submit Session</button>
+          <button class="btn ghost" type="reset">Reset</button>
+        </div>
+
+        <div class="toast" id="consultant-message"></div>
+      </form>
+    </div>
+
+    <!-- Tab: No Show -->
+    <div class="tab-panel" id="tab-noshow">
+      <div class="card">
+        <div class="panel-head">
+          <h2>Mark No-Show</h2>
+          <p>Select a student who did not show up for their appointment. This will remove them from the sign-up list.</p>
+        </div>
+
+        <label class="field">
+          <span>Select Student Sign-Up <strong>*</strong></span>
+          <select id="noshow-id-select">
+            <option value="" selected disabled>Loading sign-ups...</option>
+          </select>
+        </label>
+
+        <div id="noshow-preview" class="noshow-preview" style="display:none;">
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Student</span>
+            <span id="preview-student"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Appointment</span>
+            <span id="preview-appt"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Course</span>
+            <span id="preview-course"></span>
+          </div>
+          <div class="noshow-preview-row">
+            <span class="noshow-preview-label">Teacher</span>
+            <span id="preview-teacher"></span>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:16px;">
+          <button class="btn btn-noshow" id="noshow-btn" disabled>Mark as No-Show</button>
+        </div>
+
+        <div class="toast" id="noshow-message"></div>
+
+        <!-- Revert No-Show -->
+        <div class="section-divider">
+          <div class="panel-head">
+            <h2>Revert a No-Show</h2>
+            <p>If you accidentally marked a student as a no-show, select them below to restore their sign-up.</p>
+          </div>
+
+          <label class="field">
+            <span>Select No-Show to Revert</span>
+            <select id="revert-id-select">
+              <option value="" selected disabled>Loading no-shows...</option>
+            </select>
+          </label>
+
+          <div class="actions" style="margin-top:16px;">
+            <button class="btn btn-revert" id="revert-btn" disabled>Revert to Scheduled</button>
+          </div>
+
+          <div class="toast" id="revert-message"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Log Hours -->
+    <div class="tab-panel" id="tab-hourslog">
+
+      <div class="card" style="margin-bottom:16px;">
+        <div class="panel-head">
+          <h2>Log Hours</h2>
+          <p>Record hours outside of consultation sessions</p>
+        </div>
+
+        <form id="hours-log-form" onsubmit="return false;">
+
+          <div class="grid-2">
+            <label class="field">
+              <span>Date <strong>*</strong></span>
+              <input type="date" id="hours-date" required />
+            </label>
+            <label class="field">
+              <span>Hours <strong>*</strong></span>
+              <input type="number" id="hours-amount" min="0.5" max="12" step="0.5" placeholder="e.g. 1.5" required />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Description <strong>*</strong></span>
+            <input type="text" id="hours-description" placeholder="e.g. Writing Center training session" required />
+          </label>
+
+          <div class="actions">
+            <button class="btn primary" type="button" id="hours-submit-btn">Log Hours</button>
+            <button class="btn ghost" type="reset">Reset</button>
+          </div>
+
+          <div class="toast" id="hours-message"></div>
+
+        </form>
+      </div>
+
+      <!-- Hours history -->
+      <div class="loading-state" id="hours-loading">Loading your hours log...</div>
+      <div class="table-wrap" id="hours-table-wrap" style="display:none;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Hours</th>
+              <th>Description</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
+          <tbody id="hours-tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="hours-empty" style="display:none;">
+        No hours logged yet.
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
+  </footer>
+
+  <script src="theme-toggle.js"></script>
+  <script src="script.js?v=3"></script>
+</body>
+</html>
