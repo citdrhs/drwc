@@ -180,43 +180,49 @@ function bindSignupForm() {
 
 var _signupOptionsCache = [];
 
-async function loadSignupOptions() {
+async function loadSignupOptions(preloaded) {
   const select = document.getElementById("consult-id-select");
 
-  try {
-    const data = await apiGet("signupOptions");
-    _signupOptionsCache = data.options || [];
-
-    if (select) {
-      select.innerHTML = "";
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = _signupOptionsCache.length ? "Choose a sign-up" : "No open sign-ups";
-      placeholder.disabled = true;
-      placeholder.selected = true;
-      select.appendChild(placeholder);
-
-      _signupOptionsCache.forEach(function (opt) {
-        const option = document.createElement("option");
-        option.value = opt.consult_id;
-        option.textContent = opt.label;
-        select.appendChild(option);
-      });
-    }
-
-    populateNoShowDropdown(_signupOptionsCache);
-
-  } catch (err) {
-    if (select) {
-      select.innerHTML = "";
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "Could not load sign-ups";
-      opt.disabled = true;
-      opt.selected = true;
-      select.appendChild(opt);
+  let options;
+  if (preloaded !== undefined) {
+    options = preloaded;
+  } else {
+    try {
+      options = (await apiGet("signupOptions")).options || [];
+    } catch (err) {
+      if (select) {
+        select.innerHTML = "";
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Could not load sign-ups";
+        opt.disabled = true;
+        opt.selected = true;
+        select.appendChild(opt);
+      }
+      return;
     }
   }
+
+  _signupOptionsCache = options;
+
+  if (select) {
+    select.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = _signupOptionsCache.length ? "Choose a sign-up" : "No open sign-ups";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    _signupOptionsCache.forEach(function (opt) {
+      const option = document.createElement("option");
+      option.value = opt.consult_id;
+      option.textContent = opt.label;
+      select.appendChild(option);
+    });
+  }
+
+  populateNoShowDropdown(_signupOptionsCache);
 }
 
 function bindConsultationForm() {
@@ -229,17 +235,20 @@ function bindConsultationForm() {
 
     const fd = new FormData(form);
     try {
+      // The "consultantName" form input now carries the consultant_id as its
+      // value (the dropdown's option values are IDs; only the display text is
+      // the name). The server resolves the ID to a display name before
+      // writing the Consultations row.
       const res = await apiPost("submitConsultation", {
-        consult_id:  fd.get("consultId"),
-        consultant:  fd.get("consultantName"),
-        before_conf: fd.get("beforeConfidence"),
-        after_conf:  fd.get("afterConfidence"),
-        duration:    Number(fd.get("duration")) || 0,
-        dual_enroll: fd.get("dualEnroll") === "true",
-        due_date:    fd.get("dueDate"),
-        notes:       fd.get("workedOn"),
-        next_steps:  fd.get("nextSteps"),
-        password:    ""
+        consult_id:    fd.get("consultId"),
+        consultant_id: fd.get("consultantName"),
+        before_conf:   fd.get("beforeConfidence"),
+        after_conf:    fd.get("afterConfidence"),
+        duration:      Number(fd.get("duration")) || 0,
+        dual_enroll:   fd.get("dualEnroll") === "true",
+        due_date:      fd.get("dueDate"),
+        notes:         fd.get("workedOn"),
+        next_steps:    fd.get("nextSteps")
       });
 
       if (res.ok) {
@@ -452,40 +461,13 @@ async function loadAppointments() {
 
 // ── Consultants dropdown ──────────────────────────────────────────────────────
 
-async function loadConsultants() {
+async function loadConsultants(_preselect, preloaded) {
   const select = document.getElementById("consultant-name-select");
   if (!select) return;
 
+  let consultants;
   try {
-    const data = await apiGet("getConsultants");
-    const consultants = data.consultants || [];
-
-    select.innerHTML = "";
-
-    if (consultants.length === 0) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "No consultants found";
-      opt.disabled = true;
-      opt.selected = true;
-      select.appendChild(opt);
-      return;
-    }
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Select your name";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    select.appendChild(placeholder);
-
-    consultants.forEach(function (name) {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      select.appendChild(option);
-    });
-
+    consultants = preloaded || (await apiGet("getConsultants")).consultants || [];
   } catch (err) {
     select.innerHTML = "";
     const opt = document.createElement("option");
@@ -494,7 +476,43 @@ async function loadConsultants() {
     opt.disabled = true;
     opt.selected = true;
     select.appendChild(opt);
+    return;
   }
+
+  select.innerHTML = "";
+
+  if (consultants.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No consultants found";
+    opt.disabled = true;
+    opt.selected = true;
+    select.appendChild(opt);
+    return;
+  }
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select your name";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  select.appendChild(placeholder);
+
+  // The server returns either {id,name} objects (new) or plain strings (legacy).
+  consultants.forEach(function (c) {
+    const option = document.createElement("option");
+    if (typeof c === "string") {
+      option.value = c;
+      option.textContent = c;
+    } else {
+      option.value = c.id || c.name;
+      option.textContent = c.name;
+    }
+    if (_preselect && option.textContent === _preselect) option.selected = true;
+    select.appendChild(option);
+  });
+
+  if (!select.value) select.selectedIndex = 0;
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -563,9 +581,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await res.json();
 
       if (data.ok) {
-        // Store full session with consultant name
         sessionStorage.setItem("wc_consultant_session", JSON.stringify({
           name: data.name,
+          consultant_id: data.consultant_id || "",
           username: username
         }));
         showMsg("Access granted! Redirecting...", "info");
@@ -623,15 +641,27 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   });
 
-  // Load everything in parallel
+  // ONE API call for everything the dashboard needs (was 7 parallel calls).
+  // Each Apps Script invocation pays a cold-start tax of ~500–1500ms, so
+  // bundling these saves several seconds of dashboard load time.
+  let dashboard = {};
+  try {
+    dashboard = await apiGet("dashboardData", {
+      consultant_id: session.consultant_id || "",
+      name: session.name
+    });
+  } catch (err) {
+    console.error("dashboardData failed; falling back to individual fetches", err);
+  }
+
   await Promise.all([
-    loadStats(session.name),
-    loadHistory(session.name),
-    loadSignupOptions(),
-    loadConsultants(session.name),
-    loadNoShowOptions(),
-    loadRevertOptions(),
-    loadHoursLog(session.name)
+    loadStats(session.name, dashboard.stats),
+    loadHistory(session.name, dashboard.history),
+    loadSignupOptions(dashboard.signupOptions),
+    loadConsultants(session.name, dashboard.consultants),
+    loadNoShowOptions(dashboard.signupOptions),
+    loadRevertOptions(dashboard.noShowOptions),
+    loadHoursLog(session.name, dashboard.hoursLog)
   ]);
 
   // Bind form
@@ -644,9 +674,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   bindHoursLogForm(session.name);
 });
 
-async function loadStats(name) {
+async function loadStats(name, preloaded) {
   try {
-    const statsData = await apiGet("getConsultantStats", { name: name });
+    const statsData = preloaded || await apiGet("getConsultantStats", { name: name });
     document.getElementById("stat-consults").textContent = statsData.total_consults || 0;
     document.getElementById("stat-hours").textContent    = statsData.total_hours    || 0;
     document.getElementById("stat-minutes").textContent  = statsData.total_minutes  || 0;
@@ -655,15 +685,14 @@ async function loadStats(name) {
   }
 }
 
-async function loadHistory(name) {
+async function loadHistory(name, preloaded) {
   const loading   = document.getElementById("history-loading");
   const tableWrap = document.getElementById("history-table-wrap");
   const empty     = document.getElementById("history-empty");
   const tbody     = document.getElementById("history-tbody");
 
   try {
-    const data = await apiGet("getConsultantHistory", { name: name });
-    const rows = data.rows || [];
+    const rows = preloaded !== undefined ? preloaded : ((await apiGet("getConsultantHistory", { name: name })).rows || []);
 
     loading.style.display = "none";
 
@@ -701,47 +730,14 @@ async function loadHistory(name) {
   }
 }
 
-async function loadConsultants(preselect) {
-  const select = document.getElementById("consultant-name-select");
-  if (!select) return;
-
-  try {
-    const data = await apiGet("getConsultants");
-    const consultants = data.consultants || [];
-
-    select.innerHTML = "";
-
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Select your name";
-    placeholder.disabled = true;
-    select.appendChild(placeholder);
-
-    consultants.forEach(function (name) {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      if (preselect && name === preselect) option.selected = true;
-      select.appendChild(option);
-    });
-
-    // If preselected name not found, show placeholder
-    if (!select.value) select.selectedIndex = 0;
-
-  } catch (err) {
-    select.innerHTML = "<option disabled selected>Could not load</option>";
-  }
-}
-
 // ── No Show (consultant-dashboard.html) ──────────────────────────────────────
 
-async function loadNoShowOptions() {
+async function loadNoShowOptions(preloaded) {
   const select = document.getElementById("noshow-id-select");
   if (!select) return;
 
   try {
-    const data = await apiGet("signupOptions");
-    const options = data.options || [];
+    const options = preloaded !== undefined ? preloaded : ((await apiGet("signupOptions")).options || []);
 
     select.innerHTML = "";
     const placeholder = document.createElement("option");
@@ -777,13 +773,12 @@ async function loadNoShowOptions() {
   }
 }
 
-async function loadRevertOptions() {
+async function loadRevertOptions(preloaded) {
   const select = document.getElementById("revert-id-select");
   if (!select) return;
 
   try {
-    const data = await apiGet("noShowOptions");
-    const options = data.options || [];
+    const options = preloaded !== undefined ? preloaded : ((await apiGet("noShowOptions")).options || []);
 
     select.innerHTML = "";
     const placeholder = document.createElement("option");
@@ -870,7 +865,7 @@ async function submitRevert() {
 
 // ── Hours Log (consultant-dashboard.html) ─────────────────────────────────────
 
-async function loadHoursLog(name) {
+async function loadHoursLog(name, preloaded) {
   const loading   = document.getElementById("hours-loading");
   const tableWrap = document.getElementById("hours-table-wrap");
   const empty     = document.getElementById("hours-empty");
@@ -878,8 +873,7 @@ async function loadHoursLog(name) {
   if (!loading) return;
 
   try {
-    const data = await apiGet("getHoursLog", { name: name });
-    const rows = data.rows || [];
+    const rows = preloaded !== undefined ? preloaded : ((await apiGet("getHoursLog", { name: name })).rows || []);
 
     loading.style.display = "none";
 

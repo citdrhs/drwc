@@ -1,3 +1,5 @@
+/* Home-page-specific styles. Nav rules live in style.css. */
+
 .home_logo img {
   height: 300px;
   width: auto;
@@ -7,6 +9,11 @@
 .home_header {
   width: 100%;
   height: 340px;
+  background-color: #d6d6db;
+}
+
+body.light-mode .home_header {
+  background-color: #f0f0f5;
 }
 
 .home_logo {
@@ -15,17 +22,12 @@
   height: 100%;
 }
 
-.home_header {
-  background-color: #d6d6db;
-}
-
 .buttons{
   text-align: center;
   list-style-type: none;
   width: 50%;
   float: left;
-  margin: auto auto;
-  margin-top: 80px;
+  margin: 80px auto 0;
 }
 
 .buttons a:hover {
@@ -58,24 +60,19 @@
   border-radius: 4px;
 }
 
-#navlogo {
-  height: 30px;
-  width: auto;
-}
-
-#navlogo_link {
-  padding: 10px 20px;
-}
-
-
 #indexbody{
     flex: 1;
-    background: #dbf4ff;
+    background: #1a3a6e;       /* dark-mode default — readable with white text */
+    color: var(--text);
     border-radius: 50px;
     margin: 50px;
     padding: 60px 30px;
     text-align: center;
     width: 300px;
     vertical-align: middle;
-    
+}
+
+body.light-mode #indexbody {
+    background: #dbf4ff;       /* light cyan in light mode */
+    color: rgba(0, 0, 0, 0.9);
 }

@@ -90,7 +90,10 @@ nav a:not(:hover) {
 /* ----- FOOTER ----- */
 
 footer {
-  bottom: 0;
+  /* `margin-top: auto` (combined with body's flex-direction: column) pushes
+     the footer to the bottom of the viewport on short pages. */
+  margin-top: auto;
+  flex-shrink: 0;
   width: 100%;
   background-color: #101424;
   text-align: left;
@@ -329,16 +332,23 @@ body.light-mode #apptext2 {
 .dropdown-content {
   display:none;
   background-color: #0f2849;
-  color: #f2f2f2;
+  color: #ffffff;
   padding: 15px 0 25px;
   width: 400px;
   margin: auto;
   border-radius: 0 0 10px 10px;
 }
 
+/* Make link text inside dropdowns readable on the dark teal/blue surface.
+   Original used the browser default link color (low contrast vs. teal). */
+.dropdown-content a {
+  color: #d8ecff;
+  text-decoration: underline;
+}
+
 body.light-mode .dropdown-content {
   background-color: rgb(50, 74, 84);
-  color: #dedede;
+  color: #ffffff;
 }
 
 #bubbleresource{
@@ -425,16 +435,21 @@ body.light-mode input:focus, body.light-mode select:focus, body.light-mode texta
   box-sizing:border-box
 }
 
-html,body{
-  min-height:100%
+html, body{
+  min-height: 100%;
 }
 
+/* Body becomes a flex column so the footer can stick to the bottom on
+   short pages via `margin-top: auto`. */
 body{
-  margin:0;
+  margin: 0;
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 
@@ -662,14 +677,15 @@ input:focus, select:focus, textarea:focus{
 
 .footer{
   max-width: 1100px;
-  margin: 0 auto;
+  margin: auto auto 0;    /* auto top margin pushes to bottom; left/right auto centers */
   padding: 18px;
   color: var(--text);
   font-size: 14px;
   border-top: 1px solid var(--line);
   background: var(--bg);
   border-radius: var(--radius);
-  margin-top: 18px;
+  flex-shrink: 0;
+  width: 100%;
 }
 
 body.light-mode .footer {
