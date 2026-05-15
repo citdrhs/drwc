@@ -647,7 +647,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 async function loadStats(name) {
   try {
     const statsData = await apiGet("getConsultantStats", { name: name });
-
     document.getElementById("stat-consults").textContent = statsData.total_consults || 0;
     document.getElementById("stat-hours").textContent    = statsData.total_hours    || 0;
     document.getElementById("stat-minutes").textContent  = statsData.total_minutes  || 0;
