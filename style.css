@@ -2,6 +2,17 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif; /* can be changed in the future */
+}
+
+html {
+  background-color: #1a1a1a;
+}
+
+body.light-mode {
+  /* html bg follows the theme so the area below the body fill doesn't flash white */
+}
+
+html:has(body.light-mode) {
   background-color: #ffffff;
 }
 
@@ -113,9 +124,14 @@ footer p {
 
 #wrap { /* centers the calendar */
   text-align: center;
-  background-color: #dedede;
+  background-color: #1a1a1a;
+  color: var(--text);
   margin-bottom:0;
   height:50%;
+}
+
+body.light-mode #wrap {
+  background-color: #dedede;
 }
 
 
@@ -982,4 +998,35 @@ body.light-mode .btn-revert {
 
 body.light-mode .btn-revert:hover:not(:disabled) {
   background: rgba(35,62,144,.18);
+}
+
+/* ── Light-mode overrides for elements that hardcoded white overlays ─────────
+   The original styles use rgba(255,255,255,...) overlays that work in dark
+   mode but render white-on-white in light mode. These overrides invert the
+   overlay color so the surfaces stay visible. */
+
+body.light-mode .site-header {
+  background: linear-gradient(to bottom, rgba(0,0,0,.04), transparent);
+}
+
+body.light-mode .tab-btn,
+body.light-mode .cf-tab-btn,
+body.light-mode .btn {
+  background: rgba(0,0,0,.04);
+}
+
+body.light-mode .tab-btn:hover,
+body.light-mode .cf-tab-btn:hover,
+body.light-mode .btn:hover {
+  background: rgba(0,0,0,.08);
+}
+
+body.light-mode .item {
+  border-color: rgba(0,0,0,.10);
+}
+
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea {
+  background: rgba(0,0,0,.04);
 }

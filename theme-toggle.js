@@ -7,7 +7,7 @@ if (currentTheme === 'light-mode') {
 // Create and append toggle button
 const themeToggle = document.createElement('button');
 themeToggle.id = 'theme-toggle';
-themeToggle.textContent = currentTheme === 'light-mode' ? '🌙 Dark' : '☀️ Light';
+themeToggle.textContent = currentTheme === 'light-mode' ? 'Dark Mode' : 'Light Mode';
 document.body.appendChild(themeToggle);
 
 // Toggle theme on button click
@@ -15,5 +15,5 @@ themeToggle.addEventListener('click', function() {
   const isLightMode = document.body.classList.toggle('light-mode');
   const newTheme = isLightMode ? 'light-mode' : 'dark-mode';
   localStorage.setItem('theme', newTheme);
-  themeToggle.textContent = isLightMode ? '🌙 Dark' : '☀️ Light';
+  themeToggle.textContent = isLightMode ? 'Dark Mode' : 'Light Mode';
 });
