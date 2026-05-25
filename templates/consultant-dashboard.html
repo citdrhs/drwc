@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Consultant Dashboard{% endblock %}
+
+{% block early_script %}
+<script>
+  const _session = JSON.parse(sessionStorage.getItem('wc_consultant_session') || 'null');
+  if (!_session || !_session.name) {
+    window.location.replace("./login.html");
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+  <div class="dashboard-header">
+    <div>
+      <h1>Welcome, <span id="consultant-name"></span></h1>
+      <p>Deep Run Writing Center &mdash; Consultant Dashboard</p>
+    </div>
+    <a class="logout-btn" href="#" id="logout-btn">Log Out</a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Consultations</div>
+      <div class="stat-value" id="stat-consults">—</div>
+      <div class="stat-sub">sessions completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Consulting Hours</div>
+      <div class="stat-value" id="stat-consulting-hours">—</div>
+      <div class="stat-sub"><span id="stat-consulting-minutes">—</span> minutes total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Hours</div>
+      <div class="stat-value" id="stat-total-hours">—</div>
+      <div class="stat-sub">incl. <span id="stat-extra-hours">—</span> extra volunteering hrs</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="history">My Consultations</button>
+    <button class="tab-btn" data-tab="form">Submit Session</button>
+    <button class="tab-btn" data-tab="noshow">No Show</button>
+    <button class="tab-btn" data-tab="hourslog">Log Extra Hours</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-history">
+    <div class="loading-state" id="history-loading">Loading your consultations...</div>
+    <div class="table-wrap" id="history-table-wrap" style="display:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Student</th><th>Grade</th><th>Appointment</th>
+            <th>Teacher</th><th>Course</th><th>Assignment</th>
+            <th>Before</th><th>After</th><th>Duration</th><th>Due Date</th>
+            <th>Dual Enroll</th><th>Notes</th><th>Next Steps</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="history-empty" style="display:none;">
+      No consultations submitted yet.
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-form">
+    <div class="card" id="calendarintro">
+      <h2>Consultant Session Report</h2>
+      <p>Fill out this form after each consultation session. This helps us track appointments and improve our services.</p>
+      <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+    </div>
+
+    <form id="consultant-form" class="card">
+      <label class="field">
+        <span>Select Student Sign-Up <strong>*</strong></span>
+        <select name="consultId" id="consult-id-select" required>
+          <option value="" selected disabled>Loading sign-ups...</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Consultant's Name</span>
+        <input type="text" id="consultant-name-display" readonly />
+        <input type="hidden" name="consultantName" id="consultant-name-select" />
+      </label>
+
+      <label class="field">
+        <span>Due date for this writing assignment <strong>*</strong></span>
+        <input type="date" name="dueDate" required />
+      </label>
+
+      <div class="grid-2">
+        <label class="field">
+          <span>Writer confidence BEFORE <strong>*</strong></span>
+          <select name="beforeConfidence" required>
+            <option value="" selected disabled>Choose</option>
+            <option>Unsure</option>
+            <option>Somewhat Confident</option>
+            <option>Confident</option>
+            <option>Very Confident</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Writer confidence AFTER <strong>*</strong></span>
+          <select name="afterConfidence" required>
+            <option value="" selected disabled>Choose</option>
+            <option>Unsure</option>
+            <option>Somewhat Confident</option>
+            <option>Confident</option>
+            <option>Very Confident</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <span>Consultation Duration <strong>*</strong></span>
+          <div class="radio-row">
+            <label class="radio-label"><input type="radio" name="duration" value="30" required /> 30 min</label>
+            <label class="radio-label"><input type="radio" name="duration" value="60" required /> 60 min</label>
+          </div>
+        </div>
+        <div class="field">
+          <span>Dual Enrollment Student? <strong>*</strong></span>
+          <div class="radio-row">
+            <label class="radio-label"><input type="radio" name="dualEnroll" value="true" required /> Yes</label>
+            <label class="radio-label"><input type="radio" name="dualEnroll" value="false" required /> No</label>
+          </div>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>What aspects of writing did you work on today? (Shared with the student) <strong>*</strong></span>
+        <textarea name="workedOn" rows="4" required></textarea>
+      </label>
+
+      <label class="field">
+        <span>Next steps for the writer (Shared with the student) <strong>*</strong></span>
+        <textarea name="nextSteps" rows="4" required></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="btn primary" type="submit">Submit Session</button>
+        <button class="btn ghost" type="reset">Reset</button>
+      </div>
+
+      <div class="toast" id="consultant-message"></div>
+    </form>
+  </div>
+
+  <div class="tab-panel" id="tab-noshow">
+    <div class="card">
+      <div class="panel-head">
+        <h2>Mark No-Show</h2>
+        <p>Select a student who did not show up for their appointment. This will remove them from the sign-up list.</p>
+      </div>
+
+      <label class="field">
+        <span>Select Student Sign-Up <strong>*</strong></span>
+        <select id="noshow-id-select">
+          <option value="" selected disabled>Loading sign-ups...</option>
+        </select>
+      </label>
+
+      <div id="noshow-preview" class="noshow-preview" style="display:none;">
+        <div class="noshow-preview-row"><span class="noshow-preview-label">Student</span><span id="preview-student"></span></div>
+        <div class="noshow-preview-row"><span class="noshow-preview-label">Appointment</span><span id="preview-appt"></span></div>
+        <div class="noshow-preview-row"><span class="noshow-preview-label">Course</span><span id="preview-course"></span></div>
+        <div class="noshow-preview-row"><span class="noshow-preview-label">Teacher</span><span id="preview-teacher"></span></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-noshow" id="noshow-btn" disabled>Mark as No-Show</button>
+      </div>
+
+      <div class="toast" id="noshow-message"></div>
+
+      <div class="section-divider">
+        <div class="panel-head">
+          <h2>Revert a No-Show</h2>
+          <p>If you accidentally marked a student as a no-show, select them below to restore their sign-up.</p>
+        </div>
+
+        <label class="field">
+          <span>Select No-Show to Revert</span>
+          <select id="revert-id-select">
+            <option value="" selected disabled>Loading no-shows...</option>
+          </select>
+        </label>
+
+        <div class="actions">
+          <button class="btn btn-revert" id="revert-btn" disabled>Revert to Scheduled</button>
+        </div>
+
+        <div class="toast" id="revert-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-hourslog">
+    <div class="card">
+      <div class="panel-head">
+        <h2>Log Extra Volunteering Hours</h2>
+        <p>Record volunteering or training hours outside of consultation sessions. These are tracked separately from your consulting hours.</p>
+      </div>
+
+      <form id="hours-log-form" onsubmit="return false;">
+        <div class="grid-2">
+          <label class="field">
+            <span>Date <strong>*</strong></span>
+            <input type="date" id="hours-date" required />
+          </label>
+          <label class="field">
+            <span>Hours <strong>*</strong></span>
+            <input type="number" id="hours-amount" min="0.5" max="12" step="0.5" placeholder="e.g. 1.5" required />
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Description <strong>*</strong></span>
+          <input type="text" id="hours-description" placeholder="e.g. Writing Center training session" required />
+        </label>
+
+        <div class="actions">
+          <button class="btn primary" type="button" id="hours-submit-btn">Log Extra Hours</button>
+          <button class="btn ghost" type="reset">Reset</button>
+        </div>
+
+        <div class="toast" id="hours-message"></div>
+      </form>
+    </div>
+
+    <div class="loading-state" id="hours-loading">Loading your extra hours log...</div>
+    <div class="table-wrap" id="hours-table-wrap" style="display:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Hours</th><th>Description</th><th>Submitted</th>
+          </tr>
+        </thead>
+        <tbody id="hours-tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty-state" id="hours-empty" style="display:none;">
+      No extra hours logged yet.
+    </div>
+  </div>
+
+</div>
+{% endblock %}

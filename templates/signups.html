@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Sign-Ups{% endblock %}
+{% block body_attrs %} id="calendarsignup"{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="card" id="calendarintro">
+    <h2>Writing Center Student Sign-Up Form</h2>
+    <p><strong>Hours of Operation:</strong> Wednesdays during One Lunch (A Lunch and B Lunch) in room 212</p>
+    <p>When you sign up for your Writing Center appointment, please make note of the date, time, and location for your records. By submitting this form, you are committing to attending your appointment.</p>
+    <p>Please make sure that you keep your scheduled appointment and arrive on time.</p>
+    <p>Any questions or issues? Please email <a href="mailto:mdcho@henrico.k12.va.us">Mrs. Cho</a> or <a href="mailto:mbtambellini@henrico.k12.va.us">Mrs. Tambellini</a>.</p>
+  </div>
+
+  <section id="tab-signup" class="tab-panel active" role="tabpanel">
+    <div class="panel-head">
+      <h2>Student Sign-Up Form</h2>
+    </div>
+
+    <form id="signup-form" class="card">
+
+      <label class="field">
+        <span>Your name <strong>*</strong></span>
+        <select id="signup-student-select" required>
+          <option value="" selected disabled>Loading students...</option>
+        </select>
+      </label>
+
+      <div id="new-student-fields" style="display:none;">
+        <p class="warning-text">
+          <strong>⚠️ Type carefully.</strong> This information becomes your permanent Writing Center profile and will be used on every future visit. If you make a mistake, email Mrs. Cho or Mrs. Tambellini and they can fix it.
+        </p>
+        <div class="grid-2">
+          <label class="field">
+            <span>Email <strong>*</strong></span>
+            <input type="email" id="new-student-email" name="studentEmail" />
+          </label>
+          <label class="field">
+            <span>Last Name <strong>*</strong></span>
+            <input type="text" id="new-student-last" name="lastName" />
+          </label>
+        </div>
+        <div class="grid-2">
+          <label class="field">
+            <span>First Name <strong>*</strong></span>
+            <input type="text" id="new-student-first" name="firstName" />
+          </label>
+          <label class="field">
+            <span>Student Grade Level <strong>*</strong></span>
+            <select id="new-student-grade" name="studentGrade">
+              <option value="" selected disabled>Choose</option>
+              <option value="9">9th Grade</option>
+              <option value="10">10th Grade</option>
+              <option value="11">11th Grade</option>
+              <option value="12">12th Grade</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>
+          When would you like to make an appointment? <strong>*</strong><br>
+          <small>
+            Before selecting your appointment, PLEASE make sure this date and time works for your schedule.
+            By submitting this form, you are committing to this appointment.
+            If no appointments are available for the day you'd like to visit, please come as a walk-in to Room 212.
+          </small>
+        </span>
+        <select name="appointmentDateTime" id="appointment-select" required>
+          <option value="" selected disabled>Loading available appointments...</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>What is the name of the teacher who gave this writing assignment? <strong>*</strong></span>
+        <select name="teacherEmail" id="signup-teacher-email" required>
+          <option value="" selected disabled>Loading teachers...</option>
+        </select>
+      </label>
+
+      <div id="manual-teacher-fields" style="display:none;">
+        <p class="warning-text">
+          <strong>⚠️ Type carefully.</strong> This teacher will be saved to the Writing Center directory so future students can pick them from the dropdown. If you make a mistake, email Mrs. Cho or Mrs. Tambellini and they can fix it.
+        </p>
+        <div class="grid-2">
+          <label class="field">
+            <span>Teacher Name <strong>*</strong></span>
+            <input type="text" id="manual-teacher-name" name="manualTeacherName" placeholder="e.g., Mr. Smith" />
+          </label>
+          <label class="field">
+            <span>Teacher Email <strong>*</strong></span>
+            <input type="email" id="manual-teacher-email" name="manualTeacherEmail" placeholder="teacher@henrico.k12.va.us" />
+          </label>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>
+          What subject and level is the course for which you are completing this writing assignment?
+          (Example: English 12AP) <strong>*</strong>
+        </span>
+        <input type="text" name="courseInfo" required />
+      </label>
+
+      <label class="field">
+        <span>What type of writing assignment are you bringing? <strong>*</strong></span>
+        <select name="assignmentType" required>
+          <option value="" selected disabled>Choose</option>
+          <option>Analytical Essay</option>
+          <option>Argumentative/Persuasive Essay</option>
+          <option>Narrative/College Essay</option>
+          <option>CIT Paper/Proposal</option>
+          <option>Science Report</option>
+          <option>History Paper</option>
+          <option>Creative Writing</option>
+          <option>Research Paper</option>
+          <option>Oral Presentation</option>
+          <option>Other</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>
+          If possible, please include a link to a Google Document of your writing assignment
+          so your consultant can review it in advance.
+        </span>
+        <input type="url" name="googleDocLink" placeholder="Paste Google Docs link here" />
+      </label>
+
+      <div class="actions">
+        <button class="btn primary" type="submit">Submit</button>
+        <button class="btn ghost" type="reset">Reset</button>
+      </div>
+
+      <div class="toast" id="signup-message"></div>
+    </form>
+  </section>
+</main>
+{% endblock %}
