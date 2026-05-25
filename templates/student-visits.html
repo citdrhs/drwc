@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Student Visits{% endblock %}
+
+{% block content %}
+<h1 class="page-title">View Writing Center Visits for Student</h1>
+
+<main class="container">
+  <div class="card" id="calendarintro">
+    <h2>Look up a student</h2>
+    <p>Select a student to see their Writing Center visit history. No-show appointments are excluded. Only completed sessions appear.</p>
+  </div>
+
+  <section class="card">
+    <label class="field">
+      <span>Student</span>
+      <select id="sv-student-select">
+        <option value="" selected disabled>Loading students...</option>
+      </select>
+    </label>
+    <div class="toast" id="sv-message"></div>
+  </section>
+
+  <section id="sv-profile" style="display:none;">
+    <div class="card">
+      <div class="panel-head">
+        <h2 id="sv-name"></h2>
+        <p>Grade <span id="sv-grade">—</span></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="item">
+          <div class="field"><span>Total Visits</span></div>
+          <h2 class="m0" id="sv-total">—</h2>
+        </div>
+        <div class="item">
+          <div class="field"><span>Dual Enrollment Visits</span></div>
+          <h2 class="m0" id="sv-dual">—</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="panel-head">
+        <h2>Visits per teacher</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Teacher</th>
+              <th>Department</th>
+              <th>Visits</th>
+              <th>Dual Enroll</th>
+            </tr>
+          </thead>
+          <tbody id="sv-per-teacher-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="panel-head">
+        <h2>Individual visits</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Teacher</th>
+              <th>Department</th>
+              <th>Dual Enroll</th>
+            </tr>
+          </thead>
+          <tbody id="sv-visits-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="sv-empty" style="display:none;">
+    <p>No completed visits found for this student.</p>
+  </section>
+</main>
+{% endblock %}
