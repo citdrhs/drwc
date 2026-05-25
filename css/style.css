@@ -14,7 +14,7 @@
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, 'Helvetica Neue', Arial, sans-serif;
 }
 
-body.light-mode {
+html.light-mode {
   --bg: #ffffff;
   --card: rgba(0, 0, 0, .06);
   --card2: rgba(0, 0, 0, .08);
@@ -33,7 +33,7 @@ html {
   background-color: #1a1a1a;
 }
 
-html:has(body.light-mode) {
+html.light-mode {
   background-color: #ffffff;
 }
 
@@ -83,13 +83,15 @@ a:visited {
   color: var(--primary2);
 }
 
-body.light-mode a,
-body.light-mode a:visited {
+html.light-mode a,
+html.light-mode a:visited {
   color: #233e90;
 }
 
 nav a,
-nav a:visited {
+nav a:visited,
+html.light-mode nav a,
+html.light-mode nav a:visited {
   color: #f2f2f2;
 }
 
@@ -187,13 +189,13 @@ footer p {
   font-weight: 600;
 }
 
-body.light-mode .footer,
-body.light-mode .footer p {
+html.light-mode .footer,
+html.light-mode .footer p {
   color: #000000;
 }
 
-body.light-mode .footer strong,
-body.light-mode .footer a {
+html.light-mode .footer strong,
+html.light-mode .footer a {
   color: #233e90;
 }
 
@@ -209,7 +211,7 @@ body.light-mode .footer a {
   text-align: center;
 }
 
-body.light-mode .info-bubble {
+html.light-mode .info-bubble {
   background: #dbf4ff;
 }
 
@@ -244,15 +246,16 @@ ul {
   width: 100%;
   height: 340px;
   background-color: #d6d6db;
+  display: flex;
+  align-items: center;
 }
 
-body.light-mode .home_header {
+html.light-mode .home_header {
   background-color: #f0f0f5;
 }
 
 .home_logo {
   width: 50%;
-  float: left;
   height: 100%;
 }
 
@@ -266,8 +269,6 @@ body.light-mode .home_header {
   text-align: center;
   list-style-type: none;
   width: 50%;
-  float: left;
-  margin: 80px auto 0;
 }
 
 .buttons ul {
@@ -449,7 +450,7 @@ body.light-mode .home_header {
   text-decoration: underline;
 }
 
-body.light-mode .dropdown-content {
+html.light-mode .dropdown-content {
   background-color: rgb(50, 74, 84);
   color: #ffffff;
 }
@@ -482,7 +483,7 @@ body.light-mode .dropdown-content {
   background: linear-gradient(to bottom, rgba(255, 255, 255, .04), transparent);
 }
 
-body.light-mode .site-header {
+html.light-mode .site-header {
   background: linear-gradient(to bottom, rgba(0, 0, 0, .04), transparent);
 }
 
@@ -538,13 +539,13 @@ body.light-mode .site-header {
   background: rgba(124, 156, 255, .18);
 }
 
-body.light-mode .tab-btn,
-body.light-mode .btn {
+html.light-mode .tab-btn,
+html.light-mode .btn {
   background: rgba(0, 0, 0, .04);
 }
 
-body.light-mode .tab-btn:hover,
-body.light-mode .btn:hover {
+html.light-mode .tab-btn:hover,
+html.light-mode .btn:hover {
   background: rgba(0, 0, 0, .08);
 }
 
@@ -593,7 +594,7 @@ body.light-mode .btn:hover {
   border: 1px solid rgba(255, 255, 255, .10);
 }
 
-body.light-mode .item {
+html.light-mode .item {
   border-color: rgba(0, 0, 0, .10);
 }
 
@@ -704,13 +705,13 @@ tbody tr:hover {
   color: #ffd166;
 }
 
-body.light-mode .warning-text {
+html.light-mode .warning-text {
   color: #8a5a00;
   background: rgba(245, 158, 11, .10);
   border-color: rgba(245, 158, 11, .35);
 }
 
-body.light-mode .warning-text strong {
+html.light-mode .warning-text strong {
   color: #8a5a00;
 }
 
@@ -775,17 +776,17 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(124, 156, 255, .18);
 }
 
-body.light-mode input,
-body.light-mode select,
-body.light-mode textarea {
+html.light-mode input,
+html.light-mode select,
+html.light-mode textarea {
   background: rgba(0, 0, 0, .04);
   color: rgba(0, 0, 0, .92);
   border-color: rgba(0, 0, 0, .12);
 }
 
-body.light-mode input:focus,
-body.light-mode select:focus,
-body.light-mode textarea:focus {
+html.light-mode input:focus,
+html.light-mode select:focus,
+html.light-mode textarea:focus {
   border-color: rgba(35, 62, 144, .55);
   box-shadow: 0 0 0 3px rgba(35, 62, 144, .18);
 }
@@ -861,13 +862,13 @@ body.light-mode textarea:focus {
   cursor: not-allowed;
 }
 
-body.light-mode .btn-noshow {
+html.light-mode .btn-noshow {
   color: #c0392b;
   border-color: rgba(192, 57, 43, .45);
   background: rgba(192, 57, 43, .10);
 }
 
-body.light-mode .btn-noshow:hover:not(:disabled) {
+html.light-mode .btn-noshow:hover:not(:disabled) {
   background: rgba(192, 57, 43, .18);
 }
 
@@ -892,13 +893,13 @@ body.light-mode .btn-noshow:hover:not(:disabled) {
   cursor: not-allowed;
 }
 
-body.light-mode .btn-revert {
+html.light-mode .btn-revert {
   color: #233e90;
   border-color: rgba(35, 62, 144, .45);
   background: rgba(35, 62, 144, .10);
 }
 
-body.light-mode .btn-revert:hover:not(:disabled) {
+html.light-mode .btn-revert:hover:not(:disabled) {
   background: rgba(35, 62, 144, .18);
 }
 
@@ -912,7 +913,7 @@ body.light-mode .btn-revert:hover:not(:disabled) {
   gap: 8px;
 }
 
-body.light-mode .noshow-preview {
+html.light-mode .noshow-preview {
   background: rgba(0, 0, 0, .04);
 }
 
@@ -1218,7 +1219,7 @@ body.light-mode .noshow-preview {
   border-bottom-color: var(--primary2);
 }
 
-body.light-mode .dashboard-wrapper .tab-btn:hover {
+html.light-mode .dashboard-wrapper .tab-btn:hover {
   background: none;
 }
 
