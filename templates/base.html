@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Writing Center | {% block title %}{% endblock %}</title>
+
+  {#
+  Important!: ASSET_VERSION is what's known as a cache buster. The number automatically increments up when CSS/JS files
+  change.
+  This is important because browsers always download css and js to display sites instantly. If it changes, the browser
+  still refers to the old downloaded copy. ASSET_VERSION tells the browser to redownload the new styling and javascript
+  if it changes. See proxy.py inject_asset_version().
+  #}
+
+  <link href="./css/style.css?v={{ ASSET_VERSION }}" rel="stylesheet" type="text/css" />
+  <link rel="icon" href="./public/Logo.png">
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body{% block body_attrs %}{% endblock %}>
+  {% block early_script %}{% endblock %}
+
+  <nav>
+    <a id="navlogo_link" href="./"><img alt="Deep Run Writing Center logo" id="navlogo" src="./public/Logo.png"></a>
+    <a href="./consultants.html">Staff</a>
+    <a href="./media.html">Media</a>
+    <a href="./resources.html">Resources</a>
+    <a href="./applications.html">Consultant Applications</a>
+    <a href="./signups.html">Sign-Ups</a>
+    <a href="./student-visits.html">View Student Visits</a>
+    <a href="./login.html">Consultant Login</a>
+    <a href="https://bugs.drhscit.org/" target="_blank">Report Issue</a>
+    <a id="drhslogo_link" href="https://deeprun.henricoschools.us/"><img alt="Deep Run High School logo" id="drhslogo"
+        src="./public/drhslogo.png"></a>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <footer class="footer">
+    <p><strong>Writing Center Location:</strong> Room 212</p>
+    <p><strong>Sponsor Contacts</strong></p>
+    <p><strong>Mrs. Tambellini</strong> — English teacher — Room 213<br>
+      <a href="mailto:mbtambellini@henrico.k12.va.us">mbtambellini@henrico.k12.va.us</a>
+    </p>
+    <p><strong>Mrs. Cho</strong> — English teacher — Room 212<br>
+      <a href="mailto:mdcho@henrico.k12.va.us">mdcho@henrico.k12.va.us</a>
+    </p>
+  </footer>
+
+  <script src="./js/theme-toggle.js?v={{ ASSET_VERSION }}"></script>
+  <script src="./js/script.js?v={{ ASSET_VERSION }}"></script>
+  {% block extra_scripts %}{% endblock %}
+  </body>
+
+</html>
