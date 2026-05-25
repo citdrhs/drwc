@@ -14,6 +14,12 @@
   if it changes. See proxy.py inject_asset_version().
   #}
 
+  <script>
+    if (localStorage.getItem('theme') === 'light-mode') {
+      document.documentElement.classList.add('light-mode');
+    }
+  </script>
+
   <link href="./css/style.css?v={{ ASSET_VERSION }}" rel="stylesheet" type="text/css" />
   <link rel="icon" href="./public/Logo.png">
   {% block extra_head %}{% endblock %}
