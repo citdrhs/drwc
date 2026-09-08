@@ -22,10 +22,12 @@
       <label class="field">
         <span>Your name <strong>*</strong></span>
         <select id="signup-student-select" required>
+        <!-- HARDCODED LOADING RESPONSE!!! -->
           <option value="" selected disabled>Loading students...</option>
         </select>
       </label>
 
+      <!-- Display:None means that this portion is hidden on the site!!! -->
       <div id="new-student-fields" style="display:none;">
         <p class="warning-text">
           <strong>⚠️ Type carefully.</strong> This information becomes your permanent Writing Center profile and will be used on every future visit. If you make a mistake, email Mrs. Cho or Mrs. Tambellini and they can fix it.
@@ -75,10 +77,12 @@
       <label class="field">
         <span>What is the name of the teacher who gave this writing assignment? <strong>*</strong></span>
         <select name="teacherEmail" id="signup-teacher-email" required>
+          <!-- HARDCODED LOADING RESPONSE!!! -->
           <option value="" selected disabled>Loading teachers...</option>
         </select>
       </label>
 
+      <!-- Display:None means that this portion is hidden on the site!!! -->
       <div id="manual-teacher-fields" style="display:none;">
         <p class="warning-text">
           <strong>⚠️ Type carefully.</strong> This teacher will be saved to the Writing Center directory so future students can pick them from the dropdown. If you make a mistake, email Mrs. Cho or Mrs. Tambellini and they can fix it.
@@ -103,6 +107,7 @@
         <input type="text" name="courseInfo" required />
       </label>
 
+      <!-- INSTANCE OF A WORKING OPTION CHOOSER!!! -->
       <label class="field">
         <span>What type of writing assignment are you bringing? <strong>*</strong></span>
         <select name="assignmentType" required>
